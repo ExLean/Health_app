@@ -1,0 +1,13 @@
+<resources>
+    <string name="app_name">health_app</string>
+    <string name="login">Prisijungti</string>
+    <string name="goToRegister">Naujas naudotojas</string>
+    <string name="register">Registruotis</string>
+
+    <string name="psw_hint">Slaptažodis</string>
+    <string name="usr_hint">Slapyvardis</string>
+    <string name="eml_hint">El. paštas</string>
+    <string name="dte_hint">Gimimo data</string>
+    <string name="wgh_hint">Jūsų svoris (kg)</string>
+    <string name="hgh_hint">Jūsų ūgis (cm)</string>
+</resources>

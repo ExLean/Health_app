@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="25dp"
+    tools:context=".RegisterActivity">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/username_register_textField"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/usr_hint"
+            android:minHeight="48dp" />
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/password_register_textField"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/psw_hint"
+            android:inputType="textPassword"
+            android:minHeight="48dp" />
+
+        <EditText
+            android:id="@+id/email_register_textField"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/eml_hint"
+            android:inputType="textEmailAddress"
+            android:minHeight="48dp" />
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/height_register_textField"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/hgh_hint"
+            android:inputType="number"
+            android:minHeight="48dp" />
+
+        <EditText
+            android:id="@+id/Birthday"
+            android:clickable="false"
+            android:cursorVisible="false"
+            android:focusable="false"
+            android:focusableInTouchMode="false"
+            android:hint="@string/dte_hint"
+            android:layout_height="wrap_content"
+            android:layout_width="match_parent" />
+
+<!--        <DatePicker-->
+<!--            android:id="@+id/birth_register_textField"-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:calendarViewShown="false"-->
+<!--            android:hint="@string/dte_hint"-->
+<!--            android:inputType="date"-->
+<!--            android:spinnersShown="true" />-->
+
+
+    </LinearLayout>
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/register_btn"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="30dp"
+        android:text="@string/register" />
+
+</RelativeLayout>
