@@ -119,12 +119,13 @@ public class MealActivity extends AppCompatActivity {
 
             row.setOnClickListener(new View.OnClickListener() {
                 public void onClick(View v) {
-//                    Intent i = new Intent(MealActivity.this,
-//                            ProductActivity.class);
-//                    i.putExtra("json_user", (new Gson()).toJson(currentUser));
-//                    i.putExtra("json_product", (new Gson()).toJson(product));
-//                    startActivity(i);
-//                    finish();
+                    Intent i = new Intent(MealActivity.this,
+                            ProductActivity.class);
+                    i.putExtra("json_user", (new Gson()).toJson(currentUser));
+                    i.putExtra("json_meal", (new Gson()).toJson(currentMeal));
+                    i.putExtra("json_product", (new Gson()).toJson(product));
+                    startActivity(i);
+                    finish();
                 }
             });
 

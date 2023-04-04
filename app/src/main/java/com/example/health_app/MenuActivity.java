@@ -1,9 +1,13 @@
 package com.example.health_app;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
@@ -122,6 +126,31 @@ public class MenuActivity extends AppCompatActivity {
 
                         table.addView(row);
                     }
+
+                    TableRow rowButton = new TableRow(MenuActivity.this);
+
+                    Button btn = new Button(MenuActivity.this);
+                    btn.setText("Pridėti naują patiekalą");
+
+                    // Set the layout parameters of the button
+                    TableRow.LayoutParams params = new TableRow.LayoutParams(
+                            TableRow.LayoutParams.WRAP_CONTENT,
+                            TableRow.LayoutParams.WRAP_CONTENT
+                    );
+                    params.gravity = Gravity.RIGHT;
+                    btn.setLayoutParams(params);
+
+                    btn.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            Toast.makeText(MenuActivity.this,
+                                    "Labas Vakaras",
+                                    Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                    rowButton.addView(btn);
+
+                    table.addView(rowButton);
 
                     String currentKcal = totalCaloriesConsumed + "/" + totalCalories + "kcal";
                     textView.setText(currentKcal);
