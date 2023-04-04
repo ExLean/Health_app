@@ -1,6 +1,8 @@
 package com.example.health_app;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TableLayout;
 import android.widget.TableRow;
@@ -100,11 +102,23 @@ public class MenuActivity extends AppCompatActivity {
 
                         float kcalSum = 0;
                         for (Product product : meal.getProducts()) {
-                            kcalSum += product.getFood().getCalories() * (product.getAmount() / 100.0);
+                            kcalSum += product.getFood().getCalories()
+                                    * (product.getAmount() / 100.0);
                         }
                         totalCaloriesConsumed -= kcalSum;
                         String kcalText = kcalSum + "kcal";
                         row.addView(createAndFillTextView(String.valueOf(kcalText)));
+
+                        row.setOnClickListener(new View.OnClickListener() {
+                            public void onClick(View v) {
+                                Intent i = new Intent(MenuActivity.this,
+                                        MealActivity.class);
+                                i.putExtra("json_user", (new Gson()).toJson(currentUser));
+                                i.putExtra("json_meal", (new Gson()).toJson(meal));
+                                startActivity(i);
+                                finish();
+                            }
+                        });
 
                         table.addView(row);
                     }

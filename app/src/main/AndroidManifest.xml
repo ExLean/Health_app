@@ -35,6 +35,16 @@
             android:name=".MenuActivity"
             android:exported="true" />
 
+        <activity
+            android:name=".MealActivity"
+            android:windowSoftInputMode="adjustPan"
+            android:exported="true" />
+
+        <activity
+            android:name=".ProductActivity"
+            android:windowSoftInputMode="adjustPan"
+            android:exported="true" />
+
     </application>
 
 </manifest>
