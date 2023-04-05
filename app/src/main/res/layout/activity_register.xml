@@ -52,15 +52,6 @@
             android:layout_height="wrap_content"
             android:layout_width="match_parent" />
 
-<!--        <DatePicker-->
-<!--            android:id="@+id/birth_register_textField"-->
-<!--            android:layout_width="match_parent"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            android:calendarViewShown="false"-->
-<!--            android:hint="@string/dte_hint"-->
-<!--            android:inputType="date"-->
-<!--            android:spinnersShown="true" />-->
-
 
     </LinearLayout>
 

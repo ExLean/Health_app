@@ -1,5 +1,7 @@
 package com.example.health_app.models;
 
+import com.example.health_app.models.type.Metric;
+
 import java.util.List;
 
 public class Meal {
@@ -11,6 +13,8 @@ public class Meal {
     private int cookingTime;
     private String creator;
     private List<Product> products;
+    private float amount;
+    private Metric metric;
 
     public Meal(int id, int historyId, String title, String info, int cookingTime, String creator, List<Product> mealProducts) {
         this.id = id;
@@ -23,6 +27,22 @@ public class Meal {
     }
 
     public Meal() {
+    }
+
+    public float getAmount() {
+        return amount;
+    }
+
+    public void setAmount(float amount) {
+        this.amount = amount;
+    }
+
+    public Metric getMetric() {
+        return metric;
+    }
+
+    public void setMetric(Metric metric) {
+        this.metric = metric;
     }
 
     public int getId() {

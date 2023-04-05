@@ -9,7 +9,6 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.SearchView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -66,23 +65,19 @@ public class ProductActivity extends AppCompatActivity {
         }
 
         updateProduct = new ProductRequest();
-
         foodSearch = findViewById(R.id.foodSearch);
-        foodSearch.setQuery(currentProduct.getFood().getName(), true);
-
         foodList = findViewById(R.id.foodList);
-
         productAmount = findViewById(R.id.inputFProductAmount);
-        productAmount.setText(String.valueOf(currentProduct.getAmount()));
-
         btnG = findViewById(R.id.btnG);
+        btnMl = findViewById(R.id.btnMl);
+        btnSave = findViewById(R.id.btnSaveProduct);
+
         btnG.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 updateProduct.setMetric(Metric.G);
             }
         });
-        btnMl = findViewById(R.id.btnMl);
         btnMl.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -90,41 +85,97 @@ public class ProductActivity extends AppCompatActivity {
             }
         });
 
-        btnSave = findViewById(R.id.btnSaveProduct);
+        if (currentProduct.getId() == 0) {
+            btnSave.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    updateProduct.setMealId(currentProduct.getMealId());
+                    updateProduct.setAmount(Float.parseFloat(productAmount.getText().toString()));
+
+                    if (updateProduct.getFoodId() != 0 && updateProduct.getMetric() != null) {
+                        goAndCreateProduct(updateProduct);
+                    }
+                }
+            });
+        } else {
+            initializeExistingProduct();
+        }
+        showFoodList();
+    }
+
+    @Override
+    public void onBackPressed() {
+        getUpdatedMealAndGoBack();
+    }
+
+    private void initializeExistingProduct() {
+        foodSearch.setQuery(currentProduct.getFood().getName(), true);
+        productAmount.setText(String.valueOf(currentProduct.getAmount()));
+
         btnSave.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
                 updateProduct.setProductId(currentProduct.getId());
                 updateProduct.setAmount(Float.parseFloat(productAmount.getText().toString()));
+
                 if (updateProduct.getFoodId() != 0 && updateProduct.getMetric() != null) {
-
-                    ProductApi productApi = retrofitService.getRetrofit().create(ProductApi.class);
-                    productApi.updateProduct(updateProduct).enqueue(new Callback<Product>() {
-                        @Override
-                        public void onResponse(Call<Product> call, Response<Product> response) {
-                            if (response.code() == 200 && response.body() != null) {
-                                Toast.makeText(ProductActivity.this,
-                                        "Produktas atnaujintas",
-                                        Toast.LENGTH_SHORT).show();
-
-                                getUpdatedMealAndGoBack();
-                            }
-                        }
-
-                        @Override
-                        public void onFailure(Call<Product> call, Throwable t) {
-                            Toast.makeText(ProductActivity.this,
-                                    "Nepavyko išsaugoti produkto",
-                                    Toast.LENGTH_SHORT).show();
-                            Logger.getLogger(ProductActivity.class.getName()).log(Level.SEVERE,
-                                    "Error occurred", t);
-                        }
-                    });
+                    goAndUpdateProduct(updateProduct);
                 }
             }
         });
+    }
 
+    private void goAndCreateProduct(ProductRequest request) {
+        ProductApi productApi = retrofitService.getRetrofit().create(ProductApi.class);
+        productApi.createProduct(request).enqueue(new Callback<Product>() {
+            @Override
+            public void onResponse(Call<Product> call, Response<Product> response) {
+                if (response.code() == 200 && response.body() != null) {
+                    Toast.makeText(ProductActivity.this,
+                            "Produktas sukurtas",
+                            Toast.LENGTH_SHORT).show();
+
+                    getUpdatedMealAndGoBack();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Product> call, Throwable t) {
+                Toast.makeText(ProductActivity.this,
+                        "Nepavyko išsaugoti produkto",
+                        Toast.LENGTH_SHORT).show();
+                Logger.getLogger(ProductActivity.class.getName()).log(Level.SEVERE,
+                        "Error occurred", t);
+            }
+        });
+    }
+
+    private void goAndUpdateProduct(ProductRequest request) {
+        ProductApi productApi = retrofitService.getRetrofit().create(ProductApi.class);
+        productApi.updateProduct(request).enqueue(new Callback<Product>() {
+            @Override
+            public void onResponse(Call<Product> call, Response<Product> response) {
+                if (response.code() == 200 && response.body() != null) {
+                    Toast.makeText(ProductActivity.this,
+                            "Produktas atnaujintas",
+                            Toast.LENGTH_SHORT).show();
+
+                    getUpdatedMealAndGoBack();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Product> call, Throwable t) {
+                Toast.makeText(ProductActivity.this,
+                        "Nepavyko išsaugoti produkto",
+                        Toast.LENGTH_SHORT).show();
+                Logger.getLogger(ProductActivity.class.getName()).log(Level.SEVERE,
+                        "Error occurred", t);
+            }
+        });
+    }
+
+    private void showFoodList() {
         FoodApi foodApi = retrofitService.getRetrofit().create(FoodApi.class);
         foodApi.getAllFood().enqueue(new Callback<List<Food>>() {
             @Override
@@ -182,11 +233,6 @@ public class ProductActivity extends AppCompatActivity {
                         "Error occurred", t);
             }
         });
-    }
-
-    @Override
-    public void onBackPressed() {
-        getUpdatedMealAndGoBack();
     }
 
     private void getUpdatedMealAndGoBack() {

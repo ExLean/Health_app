@@ -10,6 +10,10 @@ public class ProductRequest {
     private float amount;
     private Metric metric;
 
+    public int getMealId() {
+        return mealId;
+    }
+
     public int getFoodId() {
         return foodId;
     }
@@ -36,5 +40,16 @@ public class ProductRequest {
 
     public void setMetric(Metric metric) {
         this.metric = metric;
+    }
+
+    @Override
+    public String toString() {
+        return "ProductRequest{" +
+                "productId=" + productId +
+                ", foodId=" + foodId +
+                ", mealId=" + mealId +
+                ", amount=" + amount +
+                ", metric=" + metric +
+                '}';
     }
 }

@@ -1,5 +1,7 @@
 package com.example.health_app.models.requests;
 
+import com.example.health_app.models.type.Metric;
+
 public class MealRequest {
 
     private int mealId;
@@ -8,6 +10,16 @@ public class MealRequest {
     private String info;
     private int cookingTime;
     private String creator;
+    private float amount;
+    private Metric metric;
+
+    public String getTitle() {
+        return title;
+    }
+
+    public Metric getMetric() {
+        return metric;
+    }
 
     public void setMealId(int mealId) {
         this.mealId = mealId;
@@ -31,5 +43,13 @@ public class MealRequest {
 
     public void setCreator(String creator) {
         this.creator = creator;
+    }
+
+    public void setAmount(float amount) {
+        this.amount = amount;
+    }
+
+    public void setMetric(Metric metric) {
+        this.metric = metric;
     }
 }

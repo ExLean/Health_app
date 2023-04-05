@@ -131,8 +131,6 @@ public class MenuActivity extends AppCompatActivity {
 
                     Button btn = new Button(MenuActivity.this);
                     btn.setText("Pridėti naują patiekalą");
-
-                    // Set the layout parameters of the button
                     TableRow.LayoutParams params = new TableRow.LayoutParams(
                             TableRow.LayoutParams.WRAP_CONTENT,
                             TableRow.LayoutParams.WRAP_CONTENT
@@ -143,9 +141,16 @@ public class MenuActivity extends AppCompatActivity {
                     btn.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
-                            Toast.makeText(MenuActivity.this,
-                                    "Labas Vakaras",
-                                    Toast.LENGTH_SHORT).show();
+                            Meal newMeal = new Meal();
+                            newMeal.setHistoryId(currentHistory.getId());
+                            newMeal.setTitle("");
+
+                            Intent i = new Intent(MenuActivity.this,
+                                    MealActivity.class);
+                            i.putExtra("json_user", (new Gson()).toJson(currentUser));
+                            i.putExtra("json_meal", (new Gson()).toJson(newMeal));
+                            startActivity(i);
+                            finish();
                         }
                     });
                     rowButton.addView(btn);
