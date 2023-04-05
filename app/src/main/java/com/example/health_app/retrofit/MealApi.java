@@ -28,5 +28,5 @@ public interface MealApi {
     Call<List<Meal>> getAllMeals();
 
     @DELETE("/meal/delete/{mealId}")
-    void delete(@Path("mealId") int mealId);
+    Call<Meal> delete(@Path("mealId") int mealId);
 }

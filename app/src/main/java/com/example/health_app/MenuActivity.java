@@ -4,10 +4,12 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.Gravity;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.LinearLayout;
+import android.widget.PopupMenu;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
@@ -21,10 +23,13 @@ import com.example.health_app.models.Product;
 import com.example.health_app.models.Stats;
 import com.example.health_app.models.User;
 import com.example.health_app.retrofit.HistoryApi;
+import com.example.health_app.retrofit.MealApi;
 import com.example.health_app.retrofit.RetrofitService;
 import com.example.health_app.retrofit.StatsApi;
 import com.google.gson.Gson;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -38,6 +43,7 @@ public class MenuActivity extends AppCompatActivity {
     TextView textView;
     TableLayout table;
     float totalCaloriesConsumed, totalCalories;
+    boolean doneWithDelete = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -97,21 +103,29 @@ public class MenuActivity extends AppCompatActivity {
 
                         row.addView(createAndFillTextView(meal.getTitle()));
 
-                        float amountSum = 0;
-                        for (Product product : meal.getProducts()) {
-                            amountSum += product.getAmount();
-                        }
-                        String amountText = amountSum + "g";
+                        String amountText = meal.getAmount() + meal.getMetric().toString().toLowerCase();
                         row.addView(createAndFillTextView(amountText));
 
-                        float kcalSum = 0;
+                        float allProductsAmount = 0;
+                        float allProductsKcal = 0;
                         for (Product product : meal.getProducts()) {
-                            kcalSum += product.getFood().getCalories()
+                            allProductsAmount += product.getAmount();
+                            allProductsKcal += product.getFood().getCalories()
                                     * (product.getAmount() / 100.0);
                         }
-                        totalCaloriesConsumed -= kcalSum;
-                        String kcalText = kcalSum + "kcal";
-                        row.addView(createAndFillTextView(String.valueOf(kcalText)));
+                        float mealKcal = (100 * allProductsKcal) / allProductsAmount;
+                        float mealEatenKcal = (meal.getAmount() / 100) * mealKcal;
+                        totalCaloriesConsumed -= mealEatenKcal;
+
+                        if (!Float.isNaN(mealEatenKcal)) {
+                            String s = String.valueOf(mealEatenKcal); // results in "0.525"
+                            BigDecimal rounded = new BigDecimal(s).setScale(1, RoundingMode.HALF_UP);
+                            String kcalText = rounded + "kcal";
+                            row.addView(createAndFillTextView(kcalText));
+                        } else {
+                            String kcalText = mealEatenKcal + "kcal";
+                            row.addView(createAndFillTextView(kcalText));
+                        }
 
                         row.setOnClickListener(new View.OnClickListener() {
                             public void onClick(View v) {
@@ -124,6 +138,38 @@ public class MenuActivity extends AppCompatActivity {
                             }
                         });
 
+                        row.setOnLongClickListener(new View.OnLongClickListener() {
+                            @Override
+                            public boolean onLongClick(View v) {
+                                PopupMenu popupMenu = new PopupMenu(MenuActivity.this, row);
+
+                                popupMenu.getMenuInflater().inflate(R.menu.popup_menu, popupMenu.getMenu());
+                                popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+
+                                    @Override
+                                    public boolean onMenuItemClick(MenuItem item) {
+                                        Toast.makeText(MenuActivity.this, "You Clicked " + item.getTitle(), Toast.LENGTH_SHORT).show();
+                                        if (item.getTitle().equals("Ištrinti")) {
+                                            MealApi mealApi = retrofitService.getRetrofit().create(MealApi.class);
+                                            mealApi.delete(meal.getId()).enqueue(new Callback<Meal>() {
+                                                @Override
+                                                public void onResponse(Call<Meal> call, Response<Meal> response) {
+                                                }
+
+                                                @Override
+                                                public void onFailure(Call<Meal> call, Throwable t) {
+                                                }
+                                            });
+                                        } else {
+                                            // ToDo:
+                                        }
+                                        return true;
+                                    }
+                                });
+                                popupMenu.show();
+                                return true;
+                            }
+                        });
                         table.addView(row);
                     }
 
@@ -157,8 +203,15 @@ public class MenuActivity extends AppCompatActivity {
 
                     table.addView(rowButton);
 
-                    String currentKcal = totalCaloriesConsumed + "/" + totalCalories + "kcal";
-                    textView.setText(currentKcal);
+                    if (!Float.isNaN(totalCaloriesConsumed)) {
+                        String s = String.valueOf(totalCaloriesConsumed);
+                        BigDecimal rounded = new BigDecimal(s).setScale(1, RoundingMode.HALF_UP);
+                        String currentKcal = rounded + "/" + totalCalories + "kcal";
+                        textView.setText(currentKcal);
+                    } else {
+                        String currentKcal = totalCaloriesConsumed + "/" + totalCalories + "kcal";
+                        textView.setText(currentKcal);
+                    }
                 }
             }
 

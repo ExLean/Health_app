@@ -40,6 +40,8 @@ public class ProductActivity extends AppCompatActivity {
     Product currentProduct;
     ProductRequest updateProduct;
 
+    float mealAmount;
+
     SearchView foodSearch;
     ListView foodList;
     EditText productAmount;
@@ -62,6 +64,7 @@ public class ProductActivity extends AppCompatActivity {
             currentUser = new Gson().fromJson(jsonUser, User.class);
             String jsonProduct = extras.getString("json_product");
             currentProduct = new Gson().fromJson(jsonProduct, Product.class);
+            mealAmount = extras.getFloat("float_amount");
         }
 
         updateProduct = new ProductRequest();
@@ -91,7 +94,6 @@ public class ProductActivity extends AppCompatActivity {
                 public void onClick(View v) {
                     updateProduct.setMealId(currentProduct.getMealId());
                     updateProduct.setAmount(Float.parseFloat(productAmount.getText().toString()));
-
                     if (updateProduct.getFoodId() != 0 && updateProduct.getMetric() != null) {
                         goAndCreateProduct(updateProduct);
                     }
@@ -120,6 +122,10 @@ public class ProductActivity extends AppCompatActivity {
 
                 if (updateProduct.getFoodId() != 0 && updateProduct.getMetric() != null) {
                     goAndUpdateProduct(updateProduct);
+                } else {
+                    Toast.makeText(ProductActivity.this,
+                            "Produktui butinas maisto produktas ir kiekio matas",
+                            Toast.LENGTH_LONG).show();
                 }
             }
         });

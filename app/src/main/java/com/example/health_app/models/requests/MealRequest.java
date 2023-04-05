@@ -10,15 +10,15 @@ public class MealRequest {
     private String info;
     private int cookingTime;
     private String creator;
-    private float amount;
-    private Metric metric;
+    private float mealAmount;
+    private Metric mealMetric;
 
     public String getTitle() {
         return title;
     }
 
     public Metric getMetric() {
-        return metric;
+        return mealMetric;
     }
 
     public void setMealId(int mealId) {
@@ -45,11 +45,11 @@ public class MealRequest {
         this.creator = creator;
     }
 
-    public void setAmount(float amount) {
-        this.amount = amount;
+    public void setAmount(float mealAmount) {
+        this.mealAmount = mealAmount;
     }
 
-    public void setMetric(Metric metric) {
-        this.metric = metric;
+    public void setMetric(Metric mealMetric) {
+        this.mealMetric = mealMetric;
     }
 }

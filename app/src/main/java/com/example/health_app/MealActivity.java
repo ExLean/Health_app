@@ -35,6 +35,7 @@ public class MealActivity extends AppCompatActivity {
     User currentUser;
     Meal currentMeal;
 
+    MealRequest createMeal = new MealRequest();
     MealRequest updateMeal = new MealRequest();
 
     EditText mealTitle;
@@ -58,13 +59,8 @@ public class MealActivity extends AppCompatActivity {
             currentUser = new Gson().fromJson(jsonUser, User.class);
             String jsonMeal = extras.getString("json_meal");
             currentMeal = new Gson().fromJson(jsonMeal, Meal.class);
-
-            Toast.makeText(MealActivity.this,
-                    currentMeal.getId() + " <- meal id",
-                    Toast.LENGTH_LONG).show();
         }
 
-        MealRequest createMeal = new MealRequest();
         table = findViewById(R.id.productTable);
         table.setLayoutParams(new TableLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
         table.setShrinkAllColumns(true);
@@ -109,20 +105,15 @@ public class MealActivity extends AppCompatActivity {
 
                     if (!createMeal.getTitle().equals("") && createMeal.getMetric() != null) {
                         goAndCreateMeal(createMeal);
-
-                        Intent i = new Intent(MealActivity.this, MenuActivity.class);
-                        i.putExtra("json_user", (new Gson()).toJson(currentUser));
-                        startActivity(i);
-                        finish();
                     } else {
                         Toast.makeText(MealActivity.this,
-                                "Patiekalui yra būtinas pavadinimas",
+                                "Patiekalui yra būtinas pavadinimas ir pasirinktas kiekio matas",
                                 Toast.LENGTH_LONG).show();
                     }
                 }
             });
         } else {
-            initializeNewMeal();
+            initializeExistingMeal();
         }
 
         if (currentMeal.getProducts() == null && !currentMeal.getTitle().equals("")) {
@@ -138,15 +129,16 @@ public class MealActivity extends AppCompatActivity {
 
                 row.setOnClickListener(new View.OnClickListener() {
                     public void onClick(View v) {
+
                         Toast.makeText(MealActivity.this,
-                                currentMeal.getId() + " <- meal id",
+                                currentMeal.getAmount() + " - labasss",
                                 Toast.LENGTH_LONG).show();
 
                         Intent i = new Intent(MealActivity.this,
                                 ProductActivity.class);
                         i.putExtra("json_user", (new Gson()).toJson(currentUser));
-                        i.putExtra("json_meal", (new Gson()).toJson(currentMeal));
                         i.putExtra("json_product", (new Gson()).toJson(product));
+                        i.putExtra("float_amount", currentMeal.getAmount());
                         startActivity(i);
                         finish();
                     }
@@ -166,35 +158,48 @@ public class MealActivity extends AppCompatActivity {
         finish();
     }
 
-    private void initializeNewMeal() {
+    private void initializeExistingMeal() {
         mealTitle.setText(currentMeal.getTitle());
         mealInfo.setText(currentMeal.getInfo());
         mealTime.setText(String.valueOf(currentMeal.getCookingTime()));
         mealAmount.setText(String.valueOf(currentMeal.getAmount()));
 
-        btnSave = findViewById(R.id.btnSaveMeal);
         btnSave.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-                updateMeal.setMealId(currentMeal.getId());
-                updateMeal.setTitle(mealTitle.getText().toString());
-                updateMeal.setInfo(mealInfo.getText().toString());
-                updateMeal.setCookingTime(Integer.parseInt(mealTime.getText().toString()));
-                updateMeal.setAmount(Float.parseFloat(mealAmount.getText().toString()));
-
-                if (updateMeal.getMetric() != null) {
-                    goAndUpdateMeal(updateMeal);
-                    Intent i = new Intent(MealActivity.this, MenuActivity.class);
-                    i.putExtra("json_user", (new Gson()).toJson(currentUser));
-                    startActivity(i);
-                    finish();
+                if (currentMeal.getProducts() != null) {
+                    float allProdAmount = 0;
+                    for (Product prod : currentMeal.getProducts()) {
+                        allProdAmount += prod.getAmount();
+                    }
+                    if (Float.parseFloat(mealAmount.getText().toString()) <= allProdAmount) {
+                        tryToUpdateMeal();
+                    } else {
+                        Toast.makeText(MealActivity.this,
+                                "Patiekalo svoris negali viršyti produktų svorio: " + allProdAmount + "g",
+                                Toast.LENGTH_SHORT).show();
+                    }
                 } else {
-                    // ToDo:
+                    tryToUpdateMeal();
                 }
-
             }
         });
+    }
+
+    private void tryToUpdateMeal() {
+        updateMeal.setMealId(currentMeal.getId());
+        updateMeal.setTitle(mealTitle.getText().toString());
+        updateMeal.setInfo(mealInfo.getText().toString());
+        updateMeal.setCookingTime(Integer.parseInt(mealTime.getText().toString()));
+        updateMeal.setAmount(Float.parseFloat(mealAmount.getText().toString()));
+
+        if (updateMeal.getMetric() != null) {
+            goAndUpdateMeal(updateMeal);
+        } else {
+            Toast.makeText(MealActivity.this,
+                    "Patiekalui yra būtinas kiekio matas",
+                    Toast.LENGTH_SHORT).show();
+        }
     }
 
     private void goAndCreateMeal(MealRequest request) {
@@ -208,6 +213,11 @@ public class MealActivity extends AppCompatActivity {
                     Toast.makeText(MealActivity.this,
                             "Patiekalas sukurtas",
                             Toast.LENGTH_SHORT).show();
+
+                    Intent i = new Intent(MealActivity.this, MenuActivity.class);
+                    i.putExtra("json_user", (new Gson()).toJson(currentUser));
+                    startActivity(i);
+                    finish();
                 }
             }
 
@@ -233,6 +243,8 @@ public class MealActivity extends AppCompatActivity {
                     Toast.makeText(MealActivity.this,
                             "Patiekalas atnaujintas",
                             Toast.LENGTH_SHORT).show();
+
+                    goBackToMenu();
                 }
             }
 
@@ -261,10 +273,6 @@ public class MealActivity extends AppCompatActivity {
         btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(MealActivity.this,
-                        currentMeal.getId() + " <- meal id",
-                        Toast.LENGTH_LONG).show();
-
                 Product newProduct = new Product();
                 newProduct.setMealId(currentMeal.getId());
 
@@ -272,6 +280,7 @@ public class MealActivity extends AppCompatActivity {
                         ProductActivity.class);
                 i.putExtra("json_user", (new Gson()).toJson(currentUser));
                 i.putExtra("json_product", (new Gson()).toJson(newProduct));
+                i.putExtra("float_amount", currentMeal.getAmount());
                 startActivity(i);
                 finish();
             }
@@ -285,5 +294,12 @@ public class MealActivity extends AppCompatActivity {
         TextView tv = new TextView(MealActivity.this);
         tv.setText(text);
         return tv;
+    }
+
+    private void goBackToMenu() {
+        Intent i = new Intent(MealActivity.this, MenuActivity.class);
+        i.putExtra("json_user", (new Gson()).toJson(currentUser));
+        startActivity(i);
+        finish();
     }
 }
