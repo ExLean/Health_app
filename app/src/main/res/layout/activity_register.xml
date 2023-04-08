@@ -4,7 +4,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:padding="25dp"
-    tools:context=".RegisterActivity">
+    tools:context=".RegisterActivity"
+    android:background="#808080">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -16,7 +17,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="@string/usr_hint"
-            android:minHeight="48dp" />
+            android:minHeight="48dp"
+            android:textColor="@color/black"/>
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/password_register_textField"
@@ -24,7 +26,8 @@
             android:layout_height="wrap_content"
             android:hint="@string/psw_hint"
             android:inputType="textPassword"
-            android:minHeight="48dp" />
+            android:minHeight="48dp"
+            android:textColor="@color/black"/>
 
         <EditText
             android:id="@+id/email_register_textField"
@@ -32,7 +35,8 @@
             android:layout_height="wrap_content"
             android:hint="@string/eml_hint"
             android:inputType="textEmailAddress"
-            android:minHeight="48dp" />
+            android:minHeight="48dp"
+            android:textColor="@color/black"/>
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/height_register_textField"
@@ -40,7 +44,8 @@
             android:layout_height="wrap_content"
             android:hint="@string/hgh_hint"
             android:inputType="number"
-            android:minHeight="48dp" />
+            android:minHeight="48dp"
+            android:textColor="@color/black"/>
 
         <EditText
             android:id="@+id/Birthday"
@@ -50,7 +55,8 @@
             android:focusableInTouchMode="false"
             android:hint="@string/dte_hint"
             android:layout_height="wrap_content"
-            android:layout_width="match_parent" />
+            android:layout_width="match_parent"
+            android:textColor="@color/black"/>
 
 
     </LinearLayout>
@@ -61,6 +67,8 @@
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_marginBottom="30dp"
-        android:text="@string/register" />
+        android:text="@string/register"
+        android:background="@drawable/button_border"
+        android:textColor="@color/black"/>
 
 </RelativeLayout>

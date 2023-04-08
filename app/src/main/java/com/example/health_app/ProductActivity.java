@@ -10,6 +10,7 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.SearchView;
 import android.widget.Toast;
+import android.widget.ToggleButton;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -36,22 +37,20 @@ import retrofit2.Response;
 
 public class ProductActivity extends AppCompatActivity {
 
-    User currentUser;
-    Product currentProduct;
-    ProductRequest updateProduct;
+    private User currentUser;
+    private Product currentProduct;
 
-    float mealAmount;
+    private int foodId;
 
-    SearchView foodSearch;
-    ListView foodList;
-    EditText productAmount;
-    Button btnG;
-    Button btnMl;
-    Button btnSave;
+    private SearchView foodSearch;
+    private ListView foodList;
+    private EditText productAmount;
+    private ToggleButton btnMetric;
+    private Button btnSave;
 
-    ArrayAdapter<String> adapter;
+    private ArrayAdapter<String> adapter;
 
-    RetrofitService retrofitService = new RetrofitService();
+    private RetrofitService retrofitService;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,50 +63,47 @@ public class ProductActivity extends AppCompatActivity {
             currentUser = new Gson().fromJson(jsonUser, User.class);
             String jsonProduct = extras.getString("json_product");
             currentProduct = new Gson().fromJson(jsonProduct, Product.class);
-            mealAmount = extras.getFloat("float_amount");
         }
 
-        updateProduct = new ProductRequest();
-        foodSearch = findViewById(R.id.foodSearch);
-        foodList = findViewById(R.id.foodList);
-        productAmount = findViewById(R.id.inputFProductAmount);
-        btnG = findViewById(R.id.btnG);
-        btnMl = findViewById(R.id.btnMl);
-        btnSave = findViewById(R.id.btnSaveProduct);
-
-        btnG.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                updateProduct.setMetric(Metric.G);
-            }
-        });
-        btnMl.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                updateProduct.setMetric(Metric.ML);
-            }
-        });
+        initialize();
 
         if (currentProduct.getId() == 0) {
             btnSave.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    updateProduct.setMealId(currentProduct.getMealId());
-                    updateProduct.setAmount(Float.parseFloat(productAmount.getText().toString()));
-                    if (updateProduct.getFoodId() != 0 && updateProduct.getMetric() != null) {
-                        goAndCreateProduct(updateProduct);
+                    ProductRequest createProduct = new ProductRequest();
+
+                    createProduct.setMealId(currentProduct.getMealId());
+                    createProduct.setFoodId(foodId);
+                    createProduct.setAmount(Float.parseFloat(productAmount.getText().toString()));
+                    createProduct.setMetric(Metric.valueOf(btnMetric.getText().toString()));
+
+                    if (createProduct.getFoodId() != 0 && createProduct.getMealId() != 0) {
+                        goAndCreateProduct(createProduct);
                     }
                 }
             });
         } else {
             initializeExistingProduct();
         }
+
         showFoodList();
     }
 
     @Override
     public void onBackPressed() {
-        getUpdatedMealAndGoBack();
+        getUpdatedMeal();
+    }
+
+    private void initialize() {
+        foodId = 0;
+        foodSearch = findViewById(R.id.foodSearch);
+        foodList = findViewById(R.id.foodList);
+        productAmount = findViewById(R.id.inputFProductAmount);
+        btnMetric = findViewById(R.id.btnMetric);
+        btnSave = findViewById(R.id.btnSaveProduct);
+
+        retrofitService = new RetrofitService();
     }
 
     private void initializeExistingProduct() {
@@ -117,14 +113,19 @@ public class ProductActivity extends AppCompatActivity {
         btnSave.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                ProductRequest updateProduct = new ProductRequest();
+
+                updateProduct.setMealId(currentProduct.getMealId());
+                updateProduct.setFoodId(foodId);
                 updateProduct.setProductId(currentProduct.getId());
                 updateProduct.setAmount(Float.parseFloat(productAmount.getText().toString()));
+                updateProduct.setMetric(Metric.valueOf(btnMetric.getText().toString()));
 
-                if (updateProduct.getFoodId() != 0 && updateProduct.getMetric() != null) {
+                if (updateProduct.getFoodId() != 0) {
                     goAndUpdateProduct(updateProduct);
                 } else {
                     Toast.makeText(ProductActivity.this,
-                            "Produktui butinas maisto produktas ir kiekio matas",
+                            "Produktui būtinas maisto produktas",
                             Toast.LENGTH_LONG).show();
                 }
             }
@@ -141,7 +142,7 @@ public class ProductActivity extends AppCompatActivity {
                             "Produktas sukurtas",
                             Toast.LENGTH_SHORT).show();
 
-                    getUpdatedMealAndGoBack();
+                    getUpdatedMeal();
                 }
             }
 
@@ -166,7 +167,7 @@ public class ProductActivity extends AppCompatActivity {
                             "Produktas atnaujintas",
                             Toast.LENGTH_SHORT).show();
 
-                    getUpdatedMealAndGoBack();
+                    getUpdatedMeal();
                 }
             }
 
@@ -196,6 +197,7 @@ public class ProductActivity extends AppCompatActivity {
                     adapter = new ArrayAdapter<String>(ProductActivity.this, android.R.layout.simple_list_item_1, foodArr);
 
                     foodList.setAdapter(adapter);
+                    foodList.setBackgroundResource(R.drawable.border);
                     foodList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                         @Override
                         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -203,7 +205,7 @@ public class ProductActivity extends AppCompatActivity {
 
                             for (Food food : response.body()) {
                                 if (food.getName().equals(selected)) {
-                                    updateProduct.setFoodId(food.getId());
+                                    foodId = food.getId();
                                     break;
                                 }
                             }
@@ -216,7 +218,7 @@ public class ProductActivity extends AppCompatActivity {
                             if (foodArr.contains(query)) {
                                 adapter.getFilter().filter(query);
                             } else {
-                                Toast.makeText(ProductActivity.this, "No Match found", Toast.LENGTH_LONG).show();
+                                Toast.makeText(ProductActivity.this, "Nėra tokio maisto produkto", Toast.LENGTH_LONG).show();
                             }
                             return false;
                         }
@@ -233,7 +235,7 @@ public class ProductActivity extends AppCompatActivity {
             @Override
             public void onFailure(Call<List<Food>> call, Throwable t) {
                 Toast.makeText(ProductActivity.this,
-                        "Nepavyko gauti maisto produktu",
+                        "Nepavyko gauti maisto produktų",
                         Toast.LENGTH_SHORT).show();
                 Logger.getLogger(ProductActivity.class.getName()).log(Level.SEVERE,
                         "Error occurred", t);
@@ -241,18 +243,13 @@ public class ProductActivity extends AppCompatActivity {
         });
     }
 
-    private void getUpdatedMealAndGoBack() {
-
+    private void getUpdatedMeal() {
         MealApi mealApi = retrofitService.getRetrofit().create(MealApi.class);
         mealApi.getMealById(currentProduct.getMealId()).enqueue(new Callback<Meal>() {
             @Override
             public void onResponse(Call<Meal> call, Response<Meal> response) {
                 if (response.code() == 200 && response.body() != null) {
-                    Intent i = new Intent(ProductActivity.this, MealActivity.class);
-                    i.putExtra("json_user", (new Gson()).toJson(currentUser));
-                    i.putExtra("json_meal", (new Gson()).toJson(response.body()));
-                    startActivity(i);
-                    finish();
+                    goBackToMeal(response.body());
                 }
             }
 
@@ -265,5 +262,13 @@ public class ProductActivity extends AppCompatActivity {
                         "Error occurred", t);
             }
         });
+    }
+
+    private void goBackToMeal(Meal response) {
+        Intent i = new Intent(ProductActivity.this, MealActivity.class);
+        i.putExtra("json_user", (new Gson()).toJson(currentUser));
+        i.putExtra("json_meal", (new Gson()).toJson(response));
+        startActivity(i);
+        finish();
     }
 }

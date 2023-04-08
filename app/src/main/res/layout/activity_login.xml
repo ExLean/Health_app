@@ -4,7 +4,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:padding="25dp"
-    tools:context=".LoginActivity">
+    tools:context=".LoginActivity"
+    android:background="#808080">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -20,7 +21,9 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="@string/usr_hint"
-            android:minHeight="48dp" />
+            android:minHeight="48dp"
+            android:textColor="@color/black"
+            android:textSize="18sp"/>
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/password_login_textField"
@@ -28,21 +31,28 @@
             android:layout_height="wrap_content"
             android:hint="@string/psw_hint"
             android:inputType="textPassword"
-            android:minHeight="48dp" />
+            android:minHeight="48dp"
+            android:textColor="@color/black"
+            android:textSize="18sp"/>
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/login_btn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:text="@string/login" />
+            android:text="@string/login"
+            android:background="@drawable/button_border"
+            android:textColor="@color/black"/>
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/goToRegister_btn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="end"
-            android:text="@string/goToRegister" />
+            android:text="@string/goToRegister"
+            android:background="@drawable/button_border"
+            android:textColor="@color/black"
+            android:layout_marginTop="10dp"/>
     </LinearLayout>
 
 

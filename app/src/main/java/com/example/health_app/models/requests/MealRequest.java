@@ -13,6 +13,10 @@ public class MealRequest {
     private float mealAmount;
     private Metric mealMetric;
 
+    public float getMealAmount() {
+        return mealAmount;
+    }
+
     public String getTitle() {
         return title;
     }
