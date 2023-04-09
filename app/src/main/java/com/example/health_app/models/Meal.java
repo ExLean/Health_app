@@ -1,5 +1,7 @@
 package com.example.health_app.models;
 
+import androidx.annotation.NonNull;
+
 import com.example.health_app.models.type.Metric;
 
 import java.util.List;
@@ -101,6 +103,7 @@ public class Meal {
         this.products = products;
     }
 
+    @NonNull
     @Override
     public String toString() {
         return "Meal{" +

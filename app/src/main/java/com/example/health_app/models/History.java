@@ -1,5 +1,7 @@
 package com.example.health_app.models;
 
+import androidx.annotation.NonNull;
+
 import java.io.Serializable;
 import java.sql.Date;
 import java.util.List;
@@ -53,6 +55,7 @@ public class History implements Serializable {
         this.meals = meals;
     }
 
+    @NonNull
     @Override
     public String toString() {
         return "History{" +

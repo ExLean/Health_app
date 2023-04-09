@@ -3,11 +3,10 @@ package com.example.health_app;
 import android.app.DatePickerDialog;
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.View;
-import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.health_app.models.User;
@@ -51,23 +50,15 @@ public class RegisterActivity extends AppCompatActivity {
         EditText eml_text = findViewById(R.id.email_register_textField);
 
         editText = (EditText) findViewById(R.id.Birthday);
-        DatePickerDialog.OnDateSetListener date = new DatePickerDialog.OnDateSetListener() {
-            @Override
-            public void onDateSet(DatePicker view, int year, int month, int day) {
-                myCalendar.set(Calendar.YEAR, year);
-                myCalendar.set(Calendar.MONTH, month);
-                myCalendar.set(Calendar.DAY_OF_MONTH, day);
-                updateLabel();
-            }
+        DatePickerDialog.OnDateSetListener date = (view, year, month, day) -> {
+            myCalendar.set(Calendar.YEAR, year);
+            myCalendar.set(Calendar.MONTH, month);
+            myCalendar.set(Calendar.DAY_OF_MONTH, day);
+            updateLabel();
         };
-        editText.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                new DatePickerDialog(RegisterActivity.this, date,
-                        myCalendar.get(Calendar.YEAR), myCalendar.get(Calendar.MONTH),
-                        myCalendar.get(Calendar.DAY_OF_MONTH)).show();
-            }
-        });
+        editText.setOnClickListener(view -> new DatePickerDialog(RegisterActivity.this, date,
+                myCalendar.get(Calendar.YEAR), myCalendar.get(Calendar.MONTH),
+                myCalendar.get(Calendar.DAY_OF_MONTH)).show());
 
         TextInputEditText hgh_text = findViewById(R.id.height_register_textField);
         MaterialButton register = findViewById(R.id.register_btn);
@@ -86,7 +77,7 @@ public class RegisterActivity extends AppCompatActivity {
             userApi.createUser(user)
                     .enqueue(new Callback<User>() {
                         @Override
-                        public void onResponse(Call<User> call, Response<User> response) {
+                        public void onResponse(@NonNull Call<User> call, @NonNull Response<User> response) {
                             if (response.code() != 200) {
                                 Toast.makeText(RegisterActivity.this, "Registracija nepavyko: " + response.code(), Toast.LENGTH_SHORT).show();
                             } else {
@@ -98,7 +89,7 @@ public class RegisterActivity extends AppCompatActivity {
                         }
 
                         @Override
-                        public void onFailure(Call<User> call, Throwable t) {
+                        public void onFailure(@NonNull Call<User> call, @NonNull Throwable t) {
                             Toast.makeText(RegisterActivity.this, "Registracija nepavyko", Toast.LENGTH_SHORT).show();
                             Logger.getLogger(RegisterActivity.class.getName()).log(Level.SEVERE, "Error occurred", t);
                         }

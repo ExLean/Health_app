@@ -1,6 +1,6 @@
 package com.example.health_app.models;
 
-import java.sql.Date;
+import androidx.annotation.NonNull;
 
 public class User {
 
@@ -72,6 +72,7 @@ public class User {
         this.height = height;
     }
 
+    @NonNull
     @Override
     public String toString() {
         return "User{" +

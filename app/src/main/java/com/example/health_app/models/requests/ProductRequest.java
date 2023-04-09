@@ -1,5 +1,7 @@
 package com.example.health_app.models.requests;
 
+import androidx.annotation.NonNull;
+
 import com.example.health_app.models.type.Metric;
 
 public class ProductRequest {
@@ -42,6 +44,7 @@ public class ProductRequest {
         this.metric = metric;
     }
 
+    @NonNull
     @Override
     public String toString() {
         return "ProductRequest{" +

@@ -1,6 +1,5 @@
 package com.example.health_app.retrofit;
 
-import com.example.health_app.models.Meal;
 import com.example.health_app.models.Product;
 import com.example.health_app.models.requests.ProductRequest;
 

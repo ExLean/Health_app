@@ -3,11 +3,26 @@
     <string name="login">Prisijungti</string>
     <string name="goToRegister">Naujas naudotojas</string>
     <string name="register">Registruotis</string>
-
     <string name="psw_hint">Slaptažodis</string>
     <string name="usr_hint">Slapyvardis</string>
     <string name="eml_hint">El. paštas</string>
     <string name="dte_hint">Gimimo data</string>
-    <string name="wgh_hint">Jūsų svoris (kg)</string>
     <string name="hgh_hint">Jūsų ūgis (cm)</string>
+    <string name="meal">Patiekalas:</string>
+    <string name="meal_info">Papildoma informacija:</string>
+    <string name="meal_cook_time">Paruošimo laikas (min):</string>
+    <string name="amount">Kiekis:</string>
+    <string name="metric_ml">ML</string>
+    <string name="metric_g">G</string>
+    <string name="save">Išsaugoti</string>
+    <string name="refresh">refresh image</string>
+    <string name="zero_kcal">0 kcal</string>
+    <string name="product">Produktas:</string>
+    <string name="copy_meal">Dublikuoti patiekalą</string>
+    <string name="delete">Ištrinti</string>
+    <string name="search">Paieška</string>
+    <string name="user">Naudotojas</string>
+    <string name="stats">Statistikos</string>
+    <string name="kcal_math">Kalorijų skaičiuoklė</string>
+    <string name="log_out">Atsijungti</string>
 </resources>

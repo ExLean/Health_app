@@ -1,5 +1,7 @@
 package com.example.health_app.models;
 
+import androidx.annotation.NonNull;
+
 import java.sql.Date;
 
 public class Stats {
@@ -82,6 +84,7 @@ public class Stats {
         this.date = date;
     }
 
+    @NonNull
     @Override
     public String toString() {
         return "Stats{" +

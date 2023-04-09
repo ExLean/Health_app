@@ -7,8 +7,6 @@ import android.os.Bundle;
 import android.text.SpannableString;
 import android.text.style.StyleSpan;
 import android.view.Gravity;
-import android.view.MenuItem;
-import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
@@ -19,6 +17,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.health_app.models.Meal;
@@ -31,7 +30,6 @@ import com.example.health_app.retrofit.ProductApi;
 import com.example.health_app.retrofit.RetrofitService;
 import com.google.gson.Gson;
 
-import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -71,29 +69,26 @@ public class MealActivity extends AppCompatActivity {
         initialize();
 
         if (currentMeal.getTitle().equals("")) {
-            btnSave.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    MealRequest createMeal = new MealRequest();
+            btnSave.setOnClickListener(v -> {
+                MealRequest createMeal = new MealRequest();
 
-                    createMeal.setHistoryId(currentMeal.getHistoryId());
-                    createMeal.setTitle(mealTitle.getText().toString());
-                    createMeal.setCreator(currentUser.getUsername());
-                    createMeal.setAmount(Float.parseFloat(mealAmount.getText().toString()));
-                    createMeal.setMetric(Metric.valueOf(btnMetric.getText().toString()));
-                    createMeal.setInfo(mealInfo.getText().toString());
+                createMeal.setHistoryId(currentMeal.getHistoryId());
+                createMeal.setTitle(mealTitle.getText().toString());
+                createMeal.setCreator(currentUser.getUsername());
+                createMeal.setMealAmount(Float.parseFloat(mealAmount.getText().toString()));
+                createMeal.setMealMetric(Metric.valueOf(btnMetric.getText().toString()));
+                createMeal.setInfo(mealInfo.getText().toString());
 
-                    if (mealTime != null) { // When you delete initial zero or just leave empty the app crashes
-                        createMeal.setCookingTime(Integer.parseInt(mealTime.getText().toString()));
-                    }
+                if (mealTime != null) { // When you delete initial zero or just leave empty the app crashes
+                    createMeal.setCookingTime(Integer.parseInt(mealTime.getText().toString()));
+                }
 
-                    if (!createMeal.getTitle().equals("") && createMeal.getMealAmount() > 0) {
-                        goAndCreateMeal(createMeal);
-                    } else {
-                        Toast.makeText(MealActivity.this,
-                                "Patiekalui yra būtinas pavadinimas ir kiekis",
-                                Toast.LENGTH_LONG).show();
-                    }
+                if (!createMeal.getTitle().equals("") && createMeal.getMealAmount() > 0) {
+                    goAndCreateMeal(createMeal);
+                } else {
+                    Toast.makeText(MealActivity.this,
+                            "Patiekalui yra būtinas pavadinimas ir kiekis",
+                            Toast.LENGTH_LONG).show();
                 }
             });
         } else {
@@ -135,24 +130,21 @@ public class MealActivity extends AppCompatActivity {
         mealAmount.setText(String.valueOf(currentMeal.getAmount()));
         btnMetric.setChecked(currentMeal.getMetric().toString().equals("G"));
 
-        btnSave.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (currentMeal.getProducts() != null) {
-                    float allProdAmount = 0;
-                    for (Product prod : currentMeal.getProducts()) {
-                        allProdAmount += prod.getAmount();
-                    }
-                    if (Float.parseFloat(mealAmount.getText().toString()) <= allProdAmount) {
-                        tryToUpdateMeal();
-                    } else {
-                        Toast.makeText(MealActivity.this,
-                                "Patiekalo svoris negali viršyti produktų svorio: " + allProdAmount + "g",
-                                Toast.LENGTH_SHORT).show();
-                    }
-                } else {
-                    tryToUpdateMeal();
+        btnSave.setOnClickListener(v -> {
+            if (currentMeal.getProducts() != null) {
+                float allProdAmount = 0;
+                for (Product prod : currentMeal.getProducts()) {
+                    allProdAmount += prod.getAmount();
                 }
+                if (Float.parseFloat(mealAmount.getText().toString()) <= allProdAmount) {
+                    tryToUpdateMeal();
+                } else {
+                    Toast.makeText(MealActivity.this,
+                            "Patiekalo svoris negali viršyti produktų svorio: " + allProdAmount + "g",
+                            Toast.LENGTH_SHORT).show();
+                }
+            } else {
+                tryToUpdateMeal();
             }
         });
     }
@@ -164,8 +156,8 @@ public class MealActivity extends AppCompatActivity {
         updateMeal.setTitle(mealTitle.getText().toString());
         updateMeal.setInfo(mealInfo.getText().toString());
         updateMeal.setCookingTime(Integer.parseInt(mealTime.getText().toString()));
-        updateMeal.setAmount(Float.parseFloat(mealAmount.getText().toString()));
-        updateMeal.setMetric(Metric.valueOf(btnMetric.getText().toString()));
+        updateMeal.setMealAmount(Float.parseFloat(mealAmount.getText().toString()));
+        updateMeal.setMealMetric(Metric.valueOf(btnMetric.getText().toString()));
 
         goAndUpdateMeal(updateMeal);
     }
@@ -175,7 +167,7 @@ public class MealActivity extends AppCompatActivity {
 
         mealApi.createMeal(request).enqueue(new Callback<Meal>() {
             @Override
-            public void onResponse(Call<Meal> call, Response<Meal> response) {
+            public void onResponse(@NonNull Call<Meal> call, @NonNull Response<Meal> response) {
                 if (response.code() == 200 && response.body() != null) {
                     Toast.makeText(MealActivity.this,
                             "Patiekalas sukurtas",
@@ -189,7 +181,7 @@ public class MealActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onFailure(Call<Meal> call, Throwable t) {
+            public void onFailure(@NonNull Call<Meal> call, @NonNull Throwable t) {
                 Toast.makeText(MealActivity.this,
                         "Nepavyko sukurti patiekalo",
                         Toast.LENGTH_SHORT).show();
@@ -205,7 +197,7 @@ public class MealActivity extends AppCompatActivity {
 
         mealApi.updateMeal(request).enqueue(new Callback<Meal>() {
             @Override
-            public void onResponse(Call<Meal> call, Response<Meal> response) {
+            public void onResponse(@NonNull Call<Meal> call, @NonNull Response<Meal> response) {
                 if (response.code() == 200 && response.body() != null) {
                     Toast.makeText(MealActivity.this,
                             "Patiekalas atnaujintas",
@@ -216,7 +208,7 @@ public class MealActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onFailure(Call<Meal> call, Throwable t) {
+            public void onFailure(@NonNull Call<Meal> call, @NonNull Throwable t) {
                 Toast.makeText(MealActivity.this,
                         "Nepavyko išsaugoti patiekalo",
                         Toast.LENGTH_SHORT).show();
@@ -236,37 +228,28 @@ public class MealActivity extends AppCompatActivity {
             String amountText = product.getAmount() + product.getMetric().toString().toLowerCase();
             row.addView(createAndFillTextView(amountText));
 
-            row.setOnClickListener(new View.OnClickListener() {
-                public void onClick(View v) {
-                    Intent i = new Intent(MealActivity.this,
-                            ProductActivity.class);
-                    i.putExtra("json_user", (new Gson()).toJson(currentUser));
-                    i.putExtra("json_product", (new Gson()).toJson(product));
-                    i.putExtra("float_amount", currentMeal.getAmount());
-                    startActivity(i);
-                    finish();
-                }
+            row.setOnClickListener(v -> {
+                Intent i = new Intent(MealActivity.this,
+                        ProductActivity.class);
+                i.putExtra("json_user", (new Gson()).toJson(currentUser));
+                i.putExtra("json_product", (new Gson()).toJson(product));
+                i.putExtra("float_amount", currentMeal.getAmount());
+                startActivity(i);
+                finish();
             });
 
-            row.setOnLongClickListener(new View.OnLongClickListener() {
-                @Override
-                public boolean onLongClick(View v) {
-                    PopupMenu popupMenu = new PopupMenu(MealActivity.this, row);
+            row.setOnLongClickListener(v -> {
+                PopupMenu popupMenu = new PopupMenu(MealActivity.this, row);
 
-                    popupMenu.getMenuInflater().inflate(R.menu.popup_single_menu, popupMenu.getMenu());
-                    popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-
-                        @Override
-                        public boolean onMenuItemClick(MenuItem item) {
-                            if (item.getTitle().equals("Ištrinti")) { //ToDo: need to create refresh button
-                                deleteProduct(product.getId());
-                            }
-                            return true;
-                        }
-                    });
-                    popupMenu.show();
+                popupMenu.getMenuInflater().inflate(R.menu.popup_single_menu, popupMenu.getMenu());
+                popupMenu.setOnMenuItemClickListener(item -> {
+                    if (item.getTitle().equals("Ištrinti")) { //ToDo: need to create refresh button
+                        deleteProduct(product.getId());
+                    }
                     return true;
-                }
+                });
+                popupMenu.show();
+                return true;
             });
 
             productTable.addView(row);
@@ -291,23 +274,20 @@ public class MealActivity extends AppCompatActivity {
                 TableRow.LayoutParams.WRAP_CONTENT,
                 TableRow.LayoutParams.WRAP_CONTENT
         );
-        params.gravity = Gravity.RIGHT;
+        params.gravity = Gravity.END;
         btn.setLayoutParams(params);
 
-        btn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Product newProduct = new Product();
-                newProduct.setMealId(currentMeal.getId());
+        btn.setOnClickListener(v -> {
+            Product newProduct = new Product();
+            newProduct.setMealId(currentMeal.getId());
 
-                Intent i = new Intent(MealActivity.this,
-                        ProductActivity.class);
-                i.putExtra("json_user", (new Gson()).toJson(currentUser));
-                i.putExtra("json_product", (new Gson()).toJson(newProduct));
-                i.putExtra("float_amount", currentMeal.getAmount());
-                startActivity(i);
-                finish();
-            }
+            Intent i = new Intent(MealActivity.this,
+                    ProductActivity.class);
+            i.putExtra("json_user", (new Gson()).toJson(currentUser));
+            i.putExtra("json_product", (new Gson()).toJson(newProduct));
+            i.putExtra("float_amount", currentMeal.getAmount());
+            startActivity(i);
+            finish();
         });
 
         rowButton.addView(btn);
@@ -327,12 +307,12 @@ public class MealActivity extends AppCompatActivity {
         ProductApi productApi = retrofitService.getRetrofit().create(ProductApi.class);
         productApi.delete(productId).enqueue(new Callback<Product>() {
             @Override
-            public void onResponse(Call<Product> call, Response<Product> response) {
+            public void onResponse(@NonNull Call<Product> call, @NonNull Response<Product> response) {
 
             }
 
             @Override
-            public void onFailure(Call<Product> call, Throwable t) {
+            public void onFailure(@NonNull Call<Product> call, @NonNull Throwable t) {
 
             }
         });

@@ -5,7 +5,8 @@
     android:layout_height="match_parent"
     android:padding="25dp"
     tools:context=".LoginActivity"
-    android:background="#808080">
+    android:background="#808080"
+    tools:ignore="Overdraw">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -14,7 +15,8 @@
         android:layout_alignParentBottom="true"
         android:layout_marginTop="150dp"
         android:layout_marginBottom="325dp"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        tools:ignore="UselessParent">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/username_login_textField"
@@ -54,6 +56,5 @@
             android:textColor="@color/black"
             android:layout_marginTop="10dp"/>
     </LinearLayout>
-
 
 </RelativeLayout>

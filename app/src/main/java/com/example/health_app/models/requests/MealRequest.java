@@ -13,47 +13,67 @@ public class MealRequest {
     private float mealAmount;
     private Metric mealMetric;
 
-    public float getMealAmount() {
-        return mealAmount;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public Metric getMetric() {
-        return mealMetric;
+    public int getMealId() {
+        return mealId;
     }
 
     public void setMealId(int mealId) {
         this.mealId = mealId;
     }
 
+    public int getHistoryId() {
+        return historyId;
+    }
+
     public void setHistoryId(int historyId) {
         this.historyId = historyId;
+    }
+
+    public String getTitle() {
+        return title;
     }
 
     public void setTitle(String title) {
         this.title = title;
     }
 
+    public String getInfo() {
+        return info;
+    }
+
     public void setInfo(String info) {
         this.info = info;
+    }
+
+    public int getCookingTime() {
+        return cookingTime;
     }
 
     public void setCookingTime(int cookingTime) {
         this.cookingTime = cookingTime;
     }
 
+    public String getCreator() {
+        return creator;
+    }
+
     public void setCreator(String creator) {
         this.creator = creator;
     }
 
-    public void setAmount(float mealAmount) {
+    public float getMealAmount() {
+        return mealAmount;
+    }
+
+    public void setMealAmount(float mealAmount) {
         this.mealAmount = mealAmount;
     }
 
-    public void setMetric(Metric mealMetric) {
+    public Metric getMealMetric() {
+        return mealMetric;
+    }
+
+    public void setMealMetric(Metric mealMetric) {
         this.mealMetric = mealMetric;
     }
 }

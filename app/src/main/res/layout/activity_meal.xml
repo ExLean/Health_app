@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:weightSum="3"
-    android:background="#808080">
+    android:background="#808080"
+    tools:ignore="Overdraw">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -18,7 +18,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:text="Patiekalas:"
+            android:text="@string/meal"
             android:layout_marginTop="50dp"
             android:textColor="@color/black"
             android:textSize="18sp"
@@ -31,12 +31,14 @@
             android:inputType="text"
             android:layout_gravity="center"
             android:textColor="@color/black"
-            android:layout_marginTop="5dp" />
+            android:layout_marginTop="5dp"
+            android:autofillHints="name"
+            tools:ignore="LabelFor" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Papildoma informacija:"
+            android:text="@string/meal_info"
             android:layout_gravity="center"
             android:layout_marginTop="5dp"
             android:textColor="@color/black"
@@ -51,13 +53,15 @@
             android:inputType="text|textMultiLine"
             android:layout_marginTop="5dp"
             android:isScrollContainer="true"
-            android:textColor="@color/black"/>
+            android:textColor="@color/black"
+            android:autofillHints="name"
+            tools:ignore="LabelFor" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:text="Paruošimo laikas (min):"
+            android:text="@string/meal_cook_time"
             android:layout_marginTop="5dp"
             android:textColor="@color/black"
             android:textSize="18sp"
@@ -70,7 +74,9 @@
             android:layout_gravity="center"
             android:inputType="number"
             android:layout_marginTop="5dp"
-            android:textColor="@color/black"/>
+            android:textColor="@color/black"
+            android:importantForAutofill="no"
+            tools:ignore="LabelFor" />
 
         <LinearLayout
             android:orientation="horizontal"
@@ -81,7 +87,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:text="Kiekis:"
+                android:text="@string/amount"
                 android:layout_marginTop="5dp"
                 android:layout_marginStart="15dp"
                 android:textColor="@color/black"
@@ -96,18 +102,20 @@
                 android:inputType="numberDecimal"
                 android:layout_marginTop="5dp"
                 android:layout_marginStart="15dp"
-                android:textColor="@color/black"/>
+                android:textColor="@color/black"
+                android:autofillHints="no"
+                tools:ignore="LabelFor" />
 
             <ToggleButton
                 android:id="@+id/btnMetric"
                 android:layout_width="80dp"
                 android:layout_height="40dp"
-                android:textOff="ML"
-                android:textOn="G"
+                android:textOff="@string/metric_ml"
+                android:textOn="@string/metric_g"
                 android:textColor="@color/black"
                 android:background="@drawable/border"
                 android:layout_marginTop="23dp"
-                android:layout_marginLeft="5dp"/>
+                android:layout_marginStart="5dp"/>
 
         </LinearLayout>
 
@@ -116,7 +124,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:text="Išsaugoti"
+            android:text="@string/save"
             android:layout_marginTop="5dp"
             android:textColor="@color/black"
             android:background="@drawable/button_border"/>
