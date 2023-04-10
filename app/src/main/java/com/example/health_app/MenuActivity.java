@@ -11,6 +11,7 @@ import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageButton;
@@ -55,14 +56,21 @@ public class MenuActivity extends AppCompatActivity {
     History currentHistory = new History();
 
     TextView calories;
+    TextView cfpPercent;
     TextView water;
     TableLayout mealTable;
-    float totalCaloriesConsumed, totalCalories;
-    private boolean isValuesNan;
-    private boolean wasLongPressed;
-    RetrofitService retrofitService;
     ImageButton btnReload;
 
+    float totalCaloriesConsumed;
+    float totalCalories;
+    float totalCarbsConsumed;
+    float totalFatConsumed;
+    float totalProteinConsumed;
+
+    private boolean isValuesNan;
+    private boolean wasLongPressed;
+
+    RetrofitService retrofitService;
     StatsApi statsApi;
 
     @Override
@@ -78,51 +86,63 @@ public class MenuActivity extends AppCompatActivity {
 
         initialize();
 
-        water.setOnClickListener(v -> {
-            if (!wasLongPressed) {
-                currentStats.setAmountOfCups(currentStats.getAmountOfCups() + 1);
+        water.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (!wasLongPressed) {
+                    currentStats.setAmountOfCups(currentStats.getAmountOfCups() + 1);
+
+                    int cups = currentStats.getAmountOfCups();
+                    String waterCups = "Vanduo - " + cups + " x 250 ml ";
+                    water.setText(waterCups);
+
+                    goAndUpdateStats();
+                }
+                wasLongPressed = false;
+            }
+        });
+        water.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                wasLongPressed = true;
+                currentStats.setAmountOfCups(currentStats.getAmountOfCups() - 1);
 
                 int cups = currentStats.getAmountOfCups();
                 String waterCups = "Vanduo - " + cups + " x 250 ml ";
                 water.setText(waterCups);
 
                 goAndUpdateStats();
+                return true;
             }
-            wasLongPressed = false;
         });
-        water.setOnLongClickListener(v -> {
-            wasLongPressed = true;
-            currentStats.setAmountOfCups(currentStats.getAmountOfCups() - 1);
+        btnReload.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                goAndUpdateStats();
 
-            int cups = currentStats.getAmountOfCups();
-            String waterCups = "Vanduo - " + cups + " x 250 ml ";
-            water.setText(waterCups);
-
-            goAndUpdateStats();
-            return true; // ?
-        });
-        btnReload.setOnClickListener(v -> {
-            goAndUpdateStats();
-
-            finish();
-            startActivity(getIntent());
+                finish();
+                startActivity(getIntent());
+            }
         });
 
         statsApi.getCurrentUserTodayStats(currentUser.getId()).enqueue(new Callback<Stats>() {
             @Override
             public void onResponse(@NonNull Call<Stats> call, @NonNull Response<Stats> response) {
-                if (response.isSuccessful() && response.body() != null) {
+                if (response.code() == 200 && response.body() != null) {
                     currentStats = response.body();
 
                     totalCaloriesConsumed = currentStats.getDailyCalorieIntake();
                     totalCalories = currentStats.getDailyCalorieIntake();
+
+//                    totalCarbsConsumed = currentStats.getCarbAmount();
+//                    totalFatConsumed = currentStats.getFatAmount();
+//                    totalProteinConsumed = currentStats.getProteinAmount();
                     int cups = currentStats.getAmountOfCups();
 
                     String waterCups = "Vanduo - " + cups + " x 250 ml ";
                     water.setText(waterCups);
                 }
             }
-
             @Override
             public void onFailure(@NonNull Call<Stats> call, @NonNull Throwable t) {
                 Toast.makeText(MenuActivity.this,
@@ -134,8 +154,7 @@ public class MenuActivity extends AppCompatActivity {
         });
 
         HistoryApi historyApi = retrofitService.getRetrofit().create(HistoryApi.class);
-        historyApi.getCurrentUserTodayHistory(currentUser.getId())
-                .enqueue(new Callback<History>() {
+        historyApi.getCurrentUserTodayHistory(currentUser.getId()).enqueue(new Callback<History>() {
             @Override
             public void onResponse(@NonNull Call<History> call, @NonNull Response<History> response) {
                 if (response.code() == 200) {
@@ -152,10 +171,26 @@ public class MenuActivity extends AppCompatActivity {
                             calories.setTextColor(Color.RED);
                         }
                         calories.setText(currentKcal);
+
+                        float cfpSum = totalCarbsConsumed + totalFatConsumed + totalProteinConsumed;
+                        if (!Float.isNaN(cfpSum) && cfpSum > 0) {
+                            String c = String.valueOf(((totalCarbsConsumed / cfpSum) * 100.0));
+                            BigDecimal roundedCarbs = new BigDecimal(c).setScale(0, RoundingMode.HALF_UP);
+
+                            String f = String.valueOf(((totalFatConsumed / cfpSum) * 100.0));
+                            BigDecimal roundedFat = new BigDecimal(f).setScale(0, RoundingMode.HALF_UP);
+
+                            String p = String.valueOf(((totalProteinConsumed / cfpSum) * 100.0));
+                            BigDecimal roundedProtein = new BigDecimal(p).setScale(0, RoundingMode.HALF_UP);
+
+                            String currentCfp = "Angl. - " + roundedCarbs + " %   Rieb. - " + roundedFat + " %   Balt. - " + roundedProtein + " %";
+                            cfpPercent.setText(currentCfp);
+                        }
+
+                        goAndUpdateStats();
                     }
                 }
             }
-
             @Override
             public void onFailure(@NonNull Call<History> call, @NonNull Throwable t) {
                 Toast.makeText(MenuActivity.this,
@@ -172,9 +207,14 @@ public class MenuActivity extends AppCompatActivity {
         wasLongPressed = false;
         calories = findViewById(R.id.calories);
         water = findViewById(R.id.water);
+        cfpPercent = findViewById(R.id.cfp_percent);
         mealTable = findViewById(R.id.mealTable);
         btnReload = findViewById(R.id.btnReload);
         btnReload.setImageResource(R.drawable.reload_img);
+
+        totalCarbsConsumed = 0f;
+        totalFatConsumed = 0f;
+        totalProteinConsumed = 0f;
 
         retrofitService = new RetrofitService();
         statsApi = retrofitService.getRetrofit().create(StatsApi.class);
@@ -203,6 +243,11 @@ public class MenuActivity extends AppCompatActivity {
                 return true;
             case R.id.stats:
                 goAndUpdateStats();
+                i = new Intent(MenuActivity.this, StatsActivity.class);
+                i.putExtra("json_user", (new Gson()).toJson(currentUser));
+                i.putExtra("json_stats", (new Gson()).toJson(currentStats));
+                startActivity(i);
+                finish();
                 return true;
             case R.id.calculation:
                 goAndUpdateStats();
@@ -229,27 +274,26 @@ public class MenuActivity extends AppCompatActivity {
                                 @Override
                                 public void onResponse(@NonNull Call<Product> call, @NonNull Response<Product> response) {
                                 }
-
                                 @Override
                                 public void onFailure(@NonNull Call<Product> call, @NonNull Throwable t) {
                                 }
                             });
                         }
                     }
+
+                    MealApi mealApi = retrofitService.getRetrofit().create(MealApi.class);
+                    mealApi.delete(id).enqueue(new Callback<Meal>() {
+                        @Override
+                        public void onResponse(@NonNull Call<Meal> call, @NonNull Response<Meal> response) {
+                        }
+                        @Override
+                        public void onFailure(@NonNull Call<Meal> call, @NonNull Throwable t) {
+                        }
+                    });
                 }
             }
             @Override
             public void onFailure(@NonNull Call<List<Product>> call, @NonNull Throwable t) {
-            }
-        });
-
-        MealApi mealApi = retrofitService.getRetrofit().create(MealApi.class);
-        mealApi.delete(id).enqueue(new Callback<Meal>() {
-            @Override
-            public void onResponse(@NonNull Call<Meal> call, @NonNull Response<Meal> response) {
-            }
-            @Override
-            public void onFailure(@NonNull Call<Meal> call, @NonNull Throwable t) {
             }
         });
     }
@@ -261,6 +305,9 @@ public class MenuActivity extends AppCompatActivity {
         updateStats.setStatsId(currentStats.getId());
         updateStats.setAmountOfCups(currentStats.getAmountOfCups());
         updateStats.setLeftCalories(totalCaloriesConsumed);
+        updateStats.setCarbAmount(totalCarbsConsumed);
+        updateStats.setFatAmount(totalFatConsumed);
+        updateStats.setProteinAmount(totalProteinConsumed);
 
         statsApi.updateStats(updateStats).enqueue(new Callback<Stats>() {
             @Override
@@ -291,14 +338,40 @@ public class MenuActivity extends AppCompatActivity {
 
             float allProductsAmount = 0;
             float allProductsKcal = 0;
+
+            float allProductsCarbs = 0;
+            float allProductsFat = 0;
+            float allProductsProtein = 0;
+
             for (Product product : meal.getProducts()) {
                 allProductsAmount += product.getAmount();
-                allProductsKcal += product.getFood().getCalories()
-                        * (product.getAmount() / 100.0);
+                allProductsKcal += product.getFood().getCalories() * (product.getAmount() / 100.0);
+
+                allProductsCarbs += product.getFood().getCarbs() * (product.getAmount() / 100.0);
+                allProductsFat += product.getFood().getFat() * (product.getAmount() / 100.0);
+                allProductsProtein += product.getFood().getProtein() * (product.getAmount() / 100.0);
             }
 
             float mealKcal = (100 * allProductsKcal) / allProductsAmount;
             float mealEatenKcal = (meal.getAmount() / 100) * mealKcal;
+
+            float mealCarbs = (100 * allProductsCarbs) / allProductsAmount;
+            float mealEatenCarbs = (meal.getAmount() / 100) * mealCarbs;
+            if (!Float.isNaN(mealEatenCarbs)) {
+                totalCarbsConsumed += mealEatenCarbs;
+            }
+
+            float mealFat = (100 * allProductsFat) / allProductsAmount;
+            float mealEatenFat = (meal.getAmount() / 100) * mealFat;
+            if (!Float.isNaN(mealEatenFat)) {
+                totalFatConsumed += mealEatenFat;
+            }
+
+            float mealProtein = (100 * allProductsProtein) / allProductsAmount;
+            float mealEatenProtein = (meal.getAmount() / 100) * mealProtein;
+            if (!Float.isNaN(mealEatenProtein)) {
+                totalProteinConsumed += mealEatenProtein;
+            }
 
             if (!Float.isNaN(mealEatenKcal)) {
                 totalCaloriesConsumed -= mealEatenKcal;
@@ -320,87 +393,93 @@ public class MenuActivity extends AppCompatActivity {
                 row.addView(tv);
             }
 
-            row.setOnClickListener(v -> {
-                goAndUpdateStats();
+            row.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    goAndUpdateStats();
 
-                Intent i = new Intent(MenuActivity.this,
-                        MealActivity.class);
-                i.putExtra("json_user", (new Gson()).toJson(currentUser));
-                i.putExtra("json_meal", (new Gson()).toJson(meal));
-                startActivity(i);
-                finish();
+                    Intent i = new Intent(MenuActivity.this,
+                            MealActivity.class);
+                    i.putExtra("json_user", (new Gson()).toJson(currentUser));
+                    i.putExtra("json_meal", (new Gson()).toJson(meal));
+                    startActivity(i);
+                    finish();
+                }
             });
 
-            row.setOnLongClickListener(v -> {
-                PopupMenu popupMenu = new PopupMenu(MenuActivity.this, row);
+            row.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View v) {
+                    PopupMenu popupMenu = new PopupMenu(MenuActivity.this, row);
 
-                popupMenu.getMenuInflater().inflate(R.menu.popup_menu, popupMenu.getMenu());
-                popupMenu.setOnMenuItemClickListener(item -> {
-                    if (item.getTitle().equals("Ištrinti")) {
-                        deleteMeal(meal.getId());
-                    } else {
-                        MealApi mealApi = retrofitService.getRetrofit().create(MealApi.class);
-                        mealApi.getMealById(meal.getId()).enqueue(new Callback<Meal>() {
-                            @Override
-                            public void onResponse(@NonNull Call<Meal> call, @NonNull Response<Meal> response) {
-                                if (response.code() == 200 && response.body() != null) {
-                                    MealRequest copyMeal = new MealRequest();
+                    popupMenu.getMenuInflater().inflate(R.menu.popup_menu, popupMenu.getMenu());
+                    popupMenu.setOnMenuItemClickListener(item -> {
+                        if (item.getTitle().equals("Ištrinti")) {
+                            deleteMeal(meal.getId());
+                        } else {
+                            MealApi mealApi = retrofitService.getRetrofit().create(MealApi.class);
+                            mealApi.getMealById(meal.getId()).enqueue(new Callback<Meal>() {
+                                @Override
+                                public void onResponse(@NonNull Call<Meal> call, @NonNull Response<Meal> response) {
+                                    if (response.code() == 200 && response.body() != null) {
+                                        MealRequest copyMeal = new MealRequest();
 
-                                    copyMeal.setHistoryId(response.body().getHistoryId());
-                                    copyMeal.setTitle(response.body().getTitle());
-                                    if (response.body().getInfo() != null) {
-                                        copyMeal.setInfo(response.body().getInfo());
-                                    }
-                                    copyMeal.setCreator(response.body().getCreator());
-                                    if (response.body().getCookingTime() != 0) {
-                                        copyMeal.setCookingTime(response.body().getCookingTime());
-                                    }
-                                    copyMeal.setMealAmount(response.body().getAmount());
-                                    copyMeal.setMealMetric(response.body().getMetric());
+                                        copyMeal.setHistoryId(response.body().getHistoryId());
+                                        copyMeal.setTitle(response.body().getTitle());
+                                        if (response.body().getInfo() != null) {
+                                            copyMeal.setInfo(response.body().getInfo());
+                                        }
+                                        copyMeal.setCreator(response.body().getCreator());
+                                        if (response.body().getCookingTime() != 0) {
+                                            copyMeal.setCookingTime(response.body().getCookingTime());
+                                        }
+                                        copyMeal.setMealAmount(response.body().getAmount());
+                                        copyMeal.setMealMetric(response.body().getMetric());
 
-                                    mealApi.createMeal(copyMeal).enqueue(new Callback<Meal>() {
-                                        @Override
-                                        public void onResponse(@NonNull Call<Meal> call, @NonNull Response<Meal> response) {
-                                            if (response.code() == 200 && response.body() != null) {
-                                                if (response.body().getProducts() != null) {
-                                                    ProductApi productApi = retrofitService.getRetrofit().create(ProductApi.class);
+                                        mealApi.createMeal(copyMeal).enqueue(new Callback<Meal>() {
+                                            @Override
+                                            public void onResponse(@NonNull Call<Meal> call, @NonNull Response<Meal> response) {
+                                                if (response.code() == 200 && response.body() != null) {
+                                                    if (response.body().getProducts() != null) {
+                                                        ProductApi productApi = retrofitService.getRetrofit().create(ProductApi.class);
 
-                                                    for (Product prod : response.body().getProducts()) {
-                                                        ProductRequest copyProduct = new ProductRequest();
+                                                        for (Product prod : response.body().getProducts()) {
+                                                            ProductRequest copyProduct = new ProductRequest();
 
-                                                        copyProduct.setFoodId(prod.getFood().getId());
-                                                        copyProduct.setMealId(prod.getMealId());
-                                                        copyProduct.setAmount(prod.getAmount());
-                                                        copyProduct.setMetric(prod.getMetric());
+                                                            copyProduct.setFoodId(prod.getFood().getId());
+                                                            copyProduct.setMealId(prod.getMealId());
+                                                            copyProduct.setAmount(prod.getAmount());
+                                                            copyProduct.setMetric(prod.getMetric());
 
-                                                        productApi.createProduct(copyProduct).enqueue(new Callback<Product>() {
-                                                            @Override
-                                                            public void onResponse(@NonNull Call<Product> call, @NonNull Response<Product> response) {
-                                                            }
-                                                            @Override
-                                                            public void onFailure(@NonNull Call<Product> call, @NonNull Throwable t) {
-                                                            }
-                                                        });
+                                                            productApi.createProduct(copyProduct).enqueue(new Callback<Product>() {
+                                                                @Override
+                                                                public void onResponse(@NonNull Call<Product> call, @NonNull Response<Product> response) {
+                                                                }
+                                                                @Override
+                                                                public void onFailure(@NonNull Call<Product> call, @NonNull Throwable t) {
+                                                                }
+                                                            });
+                                                        }
                                                     }
                                                 }
                                             }
-                                        }
-                                        @Override
-                                        public void onFailure(@NonNull Call<Meal> call, @NonNull Throwable t) {
-                                        }
-                                    });
+                                            @Override
+                                            public void onFailure(@NonNull Call<Meal> call, @NonNull Throwable t) {
+                                            }
+                                        });
+                                    }
                                 }
-                            }
 
-                            @Override
-                            public void onFailure(@NonNull Call<Meal> call, @NonNull Throwable t) {
-                            }
-                        });
-                    }
+                                @Override
+                                public void onFailure(@NonNull Call<Meal> call, @NonNull Throwable t) {
+                                }
+                            });
+                        }
+                        return true;
+                    });
+                    popupMenu.show();
                     return true;
-                });
-                popupMenu.show();
-                return true;
+                }
             });
 
             row.setLayoutParams(new ViewGroup.LayoutParams(20, 200));
@@ -427,19 +506,22 @@ public class MenuActivity extends AppCompatActivity {
         params.gravity = Gravity.END;
         btn.setLayoutParams(params);
 
-        btn.setOnClickListener(v -> {
-            goAndUpdateStats();
+        btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                goAndUpdateStats();
 
-            Meal newMeal = new Meal();
-            newMeal.setHistoryId(currentHistory.getId());
-            newMeal.setTitle("");
+                Meal newMeal = new Meal();
+                newMeal.setHistoryId(currentHistory.getId());
+                newMeal.setTitle("");
 
-            Intent i = new Intent(MenuActivity.this,
-                    MealActivity.class);
-            i.putExtra("json_user", (new Gson()).toJson(currentUser));
-            i.putExtra("json_meal", (new Gson()).toJson(newMeal));
-            startActivity(i);
-            finish();
+                Intent i = new Intent(MenuActivity.this,
+                        MealActivity.class);
+                i.putExtra("json_user", (new Gson()).toJson(currentUser));
+                i.putExtra("json_meal", (new Gson()).toJson(newMeal));
+                startActivity(i);
+                finish();
+            }
         });
 
         rowButton.addView(btn);

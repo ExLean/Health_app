@@ -10,6 +10,9 @@ public class StatsRequest {
     private float dailyCalorieIntake;
     private int amountOfCups;
     private float leftCalories;
+    private float carbAmount;
+    private float fatAmount;
+    private float proteinAmount;
 
     public int getStatsId() {
         return statsId;
@@ -65,5 +68,29 @@ public class StatsRequest {
 
     public void setLeftCalories(float leftCalories) {
         this.leftCalories = leftCalories;
+    }
+
+    public float getCarbAmount() {
+        return carbAmount;
+    }
+
+    public void setCarbAmount(float carbAmount) {
+        this.carbAmount = carbAmount;
+    }
+
+    public float getFatAmount() {
+        return fatAmount;
+    }
+
+    public void setFatAmount(float fatAmount) {
+        this.fatAmount = fatAmount;
+    }
+
+    public float getProteinAmount() {
+        return proteinAmount;
+    }
+
+    public void setProteinAmount(float proteinAmount) {
+        this.proteinAmount = proteinAmount;
     }
 }

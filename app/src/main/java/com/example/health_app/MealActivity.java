@@ -79,8 +79,8 @@ public class MealActivity extends AppCompatActivity {
                 createMeal.setMealMetric(Metric.valueOf(btnMetric.getText().toString()));
                 createMeal.setInfo(mealInfo.getText().toString());
 
-                if (mealTime != null) { // When you delete initial zero or just leave empty the app crashes
-                    createMeal.setCookingTime(Integer.parseInt(mealTime.getText().toString()));
+                if (mealTime.getText().toString().equals("")) {
+                    createMeal.setCookingTime(0);
                 }
 
                 if (!createMeal.getTitle().equals("") && createMeal.getMealAmount() > 0) {

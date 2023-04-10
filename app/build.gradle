@@ -43,6 +43,6 @@ dependencies {
     implementation group: 'com.squareup.retrofit2', name: 'converter-gson', version: '2.9.0'
     // For switch in ProductActivity
     implementation 'com.google.android.material:material:1.8.0'
-
-    implementation 'com.google.android.material:material:1.8.0'
+    // https://mvnrepository.com/artifact/com.jjoe64/graphview
+    implementation group: 'com.jjoe64', name: 'graphview', version: '4.2.2'
 }

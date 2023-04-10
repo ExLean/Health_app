@@ -25,6 +25,16 @@
             android:textStyle="bold" />
 
         <TextView
+            android:id="@+id/cfp_percent"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="10dp"
+            android:textColor="@color/black"
+            android:textSize="24sp"
+            android:textStyle="bold" />
+
+        <TextView
             android:id="@+id/water"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -40,7 +50,7 @@
             android:layout_width="32dp"
             android:layout_height="32dp"
             android:layout_gravity="end"
-            android:layout_marginTop="100dp"
+            android:layout_marginTop="60dp"
             android:layout_marginEnd="50dp"
             android:src="@drawable/reload_img"
             android:contentDescription="@string/refresh" />

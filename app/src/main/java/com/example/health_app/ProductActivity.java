@@ -2,6 +2,8 @@ package com.example.health_app;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -67,16 +69,19 @@ public class ProductActivity extends AppCompatActivity {
         initialize();
 
         if (currentProduct.getId() == 0) {
-            btnSave.setOnClickListener(v -> {
-                ProductRequest createProduct = new ProductRequest();
+            btnSave.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    ProductRequest createProduct = new ProductRequest();
 
-                createProduct.setMealId(currentProduct.getMealId());
-                createProduct.setFoodId(foodId);
-                createProduct.setAmount(Float.parseFloat(productAmount.getText().toString()));
-                createProduct.setMetric(Metric.valueOf(btnMetric.getText().toString()));
+                    createProduct.setMealId(currentProduct.getMealId());
+                    createProduct.setFoodId(foodId);
+                    createProduct.setAmount(Float.parseFloat(productAmount.getText().toString()));
+                    createProduct.setMetric(Metric.valueOf(btnMetric.getText().toString()));
 
-                if (createProduct.getFoodId() != 0 && createProduct.getMealId() != 0) {
-                    goAndCreateProduct(createProduct);
+                    if (createProduct.getFoodId() != 0 && createProduct.getMealId() != 0) {
+                        goAndCreateProduct(createProduct);
+                    }
                 }
             });
         } else {
@@ -106,21 +111,24 @@ public class ProductActivity extends AppCompatActivity {
         foodSearch.setQuery(currentProduct.getFood().getName(), true);
         productAmount.setText(String.valueOf(currentProduct.getAmount()));
 
-        btnSave.setOnClickListener(v -> {
-            ProductRequest updateProduct = new ProductRequest();
+        btnSave.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ProductRequest updateProduct = new ProductRequest();
 
-            updateProduct.setMealId(currentProduct.getMealId());
-            updateProduct.setFoodId(foodId);
-            updateProduct.setProductId(currentProduct.getId());
-            updateProduct.setAmount(Float.parseFloat(productAmount.getText().toString()));
-            updateProduct.setMetric(Metric.valueOf(btnMetric.getText().toString()));
+                updateProduct.setMealId(currentProduct.getMealId());
+                updateProduct.setFoodId(foodId);
+                updateProduct.setProductId(currentProduct.getId());
+                updateProduct.setAmount(Float.parseFloat(productAmount.getText().toString()));
+                updateProduct.setMetric(Metric.valueOf(btnMetric.getText().toString()));
 
-            if (updateProduct.getFoodId() != 0) {
-                goAndUpdateProduct(updateProduct);
-            } else {
-                Toast.makeText(ProductActivity.this,
-                        "Produktui būtinas maisto produktas",
-                        Toast.LENGTH_LONG).show();
+                if (updateProduct.getFoodId() != 0) {
+                    goAndUpdateProduct(updateProduct);
+                } else {
+                    Toast.makeText(ProductActivity.this,
+                            "Produktui būtinas maisto produktas",
+                            Toast.LENGTH_LONG).show();
+                }
             }
         });
     }
@@ -138,7 +146,6 @@ public class ProductActivity extends AppCompatActivity {
                     getUpdatedMeal();
                 }
             }
-
             @Override
             public void onFailure(@NonNull Call<Product> call, @NonNull Throwable t) {
                 Toast.makeText(ProductActivity.this,
@@ -163,7 +170,6 @@ public class ProductActivity extends AppCompatActivity {
                     getUpdatedMeal();
                 }
             }
-
             @Override
             public void onFailure(@NonNull Call<Product> call, @NonNull Throwable t) {
                 Toast.makeText(ProductActivity.this,
@@ -191,13 +197,16 @@ public class ProductActivity extends AppCompatActivity {
 
                     foodList.setAdapter(adapter);
                     foodList.setBackgroundResource(R.drawable.border);
-                    foodList.setOnItemClickListener((parent, view, position, id) -> {
-                        String selected = foodArr.get(position);
+                    foodList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                        @Override
+                        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                            String selected = foodArr.get(position);
 
-                        for (Food food : response.body()) {
-                            if (food.getName().equals(selected)) {
-                                foodId = food.getId();
-                                break;
+                            for (Food food : response.body()) {
+                                if (food.getName().equals(selected)) {
+                                    foodId = food.getId();
+                                    break;
+                                }
                             }
                         }
                     });
@@ -221,7 +230,6 @@ public class ProductActivity extends AppCompatActivity {
                     });
                 }
             }
-
             @Override
             public void onFailure(@NonNull Call<List<Food>> call, @NonNull Throwable t) {
                 Toast.makeText(ProductActivity.this,
@@ -242,7 +250,6 @@ public class ProductActivity extends AppCompatActivity {
                     goBackToMeal(response.body());
                 }
             }
-
             @Override
             public void onFailure(@NonNull Call<Meal> call, @NonNull Throwable t) {
                 Toast.makeText(ProductActivity.this,

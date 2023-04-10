@@ -32,20 +32,39 @@ public class Food {
         return name;
     }
 
+    public void setName(String name) {
+        this.name = name;
+    }
+
     public float getCalories() {
         return calories;
     }
 
-    @NonNull
-    @Override
-    public String toString() {
-        return "Food{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
-                ", calories=" + calories +
-                ", carbs=" + carbs +
-                ", protein=" + protein +
-                ", fat=" + fat +
-                '}';
+    public void setCalories(float calories) {
+        this.calories = calories;
+    }
+
+    public float getCarbs() {
+        return carbs;
+    }
+
+    public void setCarbs(float carbs) {
+        this.carbs = carbs;
+    }
+
+    public float getProtein() {
+        return protein;
+    }
+
+    public void setProtein(float protein) {
+        this.protein = protein;
+    }
+
+    public float getFat() {
+        return fat;
+    }
+
+    public void setFat(float fat) {
+        this.fat = fat;
     }
 }

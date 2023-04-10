@@ -51,6 +51,10 @@
             android:windowSoftInputMode="adjustPan"
             android:exported="true" />
 
+        <activity
+            android:name=".StatsActivity"
+            android:exported="true" />
+
     </application>
 
 </manifest>

@@ -13,16 +13,9 @@ public class Stats {
     private int amountOfCups;
     private float leftCalories;
     private Date date;
-
-    public Stats(int id, User user, float weight, float dailyCalorieIntake, int amountOfCups, float leftCalories, Date date) {
-        this.id = id;
-        this.user = user;
-        this.weight = weight;
-        this.dailyCalorieIntake = dailyCalorieIntake;
-        this.amountOfCups = amountOfCups;
-        this.leftCalories = leftCalories;
-        this.date = date;
-    }
+    private float carbAmount;
+    private float fatAmount;
+    private float proteinAmount;
 
     public Stats() {
 
@@ -84,7 +77,30 @@ public class Stats {
         this.date = date;
     }
 
-    @NonNull
+    public float getCarbAmount() {
+        return carbAmount;
+    }
+
+    public void setCarbAmount(float carbAmount) {
+        this.carbAmount = carbAmount;
+    }
+
+    public float getFatAmount() {
+        return fatAmount;
+    }
+
+    public void setFatAmount(float fatAmount) {
+        this.fatAmount = fatAmount;
+    }
+
+    public float getProteinAmount() {
+        return proteinAmount;
+    }
+
+    public void setProteinAmount(float proteinAmount) {
+        this.proteinAmount = proteinAmount;
+    }
+
     @Override
     public String toString() {
         return "Stats{" +
@@ -95,6 +111,9 @@ public class Stats {
                 ", amountOfCups=" + amountOfCups +
                 ", leftCalories=" + leftCalories +
                 ", date=" + date +
+                ", carbAmount=" + carbAmount +
+                ", fatAmount=" + fatAmount +
+                ", proteinAmount=" + proteinAmount +
                 '}';
     }
 }
