@@ -45,4 +45,6 @@ dependencies {
     implementation 'com.google.android.material:material:1.8.0'
     // https://mvnrepository.com/artifact/com.jjoe64/graphview
     implementation group: 'com.jjoe64', name: 'graphview', version: '4.2.2'
+
+    implementation 'com.github.PhilJay:MPAndroidChart:v3.1.0'
 }

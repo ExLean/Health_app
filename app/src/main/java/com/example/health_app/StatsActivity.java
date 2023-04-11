@@ -19,6 +19,20 @@ import com.example.health_app.models.User;
 import com.example.health_app.retrofit.ProductApi;
 import com.example.health_app.retrofit.RetrofitService;
 import com.example.health_app.retrofit.StatsApi;
+import com.github.mikephil.charting.charts.BarChart;
+import com.github.mikephil.charting.charts.PieChart;
+import com.github.mikephil.charting.components.AxisBase;
+import com.github.mikephil.charting.components.XAxis;
+import com.github.mikephil.charting.data.BarData;
+import com.github.mikephil.charting.data.BarDataSet;
+import com.github.mikephil.charting.data.BarEntry;
+import com.github.mikephil.charting.data.PieData;
+import com.github.mikephil.charting.data.PieDataSet;
+import com.github.mikephil.charting.data.PieEntry;
+import com.github.mikephil.charting.formatter.DefaultAxisValueFormatter;
+import com.github.mikephil.charting.formatter.IAxisValueFormatter;
+import com.github.mikephil.charting.formatter.ValueFormatter;
+import com.github.mikephil.charting.utils.ColorTemplate;
 import com.google.gson.Gson;
 import com.jjoe64.graphview.DefaultLabelFormatter;
 import com.jjoe64.graphview.GraphView;
@@ -50,6 +64,8 @@ public class StatsActivity extends AppCompatActivity {
     Stats currentStats;
 
     GraphView graphView;
+    BarChart barChart;
+    PieChart pieChart;
     Spinner spinner;
     String[] values;
 
@@ -77,7 +93,6 @@ public class StatsActivity extends AppCompatActivity {
         spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-
                 createGraph(values[position]);
             }
             @Override
@@ -98,7 +113,9 @@ public class StatsActivity extends AppCompatActivity {
 
     private void initialize() {
         graphView = findViewById(R.id.graphView);
+        barChart = findViewById(R.id.bar_chart);
         spinner = findViewById(R.id.spinner);
+        pieChart = findViewById(R.id.pie_chart);
 
         retrofitService = new RetrofitService();
         statsApi = retrofitService.getRetrofit().create(StatsApi.class);
@@ -116,6 +133,9 @@ public class StatsActivity extends AppCompatActivity {
                 if (response.code() == 200 && response.body() != null) {
 
                     if (graphName.equals("Svoris")) {
+                        graphView.setVisibility(View.VISIBLE);
+                        barChart.setVisibility(View.GONE);
+                        pieChart.setVisibility(View.GONE);
                         LineGraphSeries<DataPoint> lineGraphSeries = new LineGraphSeries<>();
                         for (Stats stat : response.body()) {
                             lineGraphSeries.appendData(new DataPoint(stat.getDate(), stat.getWeight()), true, response.body().size(), true);
@@ -139,6 +159,9 @@ public class StatsActivity extends AppCompatActivity {
 
                         graphView.getGridLabelRenderer().setVerticalAxisTitle("Svoris");
                     } else if (graphName.equals("Likusios kalorijos")) {
+                        graphView.setVisibility(View.VISIBLE);
+                        barChart.setVisibility(View.GONE);
+                        pieChart.setVisibility(View.GONE);
                         LineGraphSeries<DataPoint> lineGraphSeries = new LineGraphSeries<>();
                         for (Stats stat : response.body()) {
                             lineGraphSeries.appendData(new DataPoint(stat.getDate(), stat.getLeftCalories()), true, response.body().size(), true);
@@ -158,32 +181,96 @@ public class StatsActivity extends AppCompatActivity {
                         graphView.removeAllSeries();
                         graphView.addSeries(lineGraphSeries);
                         graphView.getGridLabelRenderer().setVerticalAxisTitle("Kalorijos");
-                    } else if (graphName.equals("Maistinės medžiagos")){
-                        BarGraphSeries<DataPoint> barGraphSeriesCarbs = new BarGraphSeries<>();
-//                        BarGraphSeries<DataPoint> barGraphSeriesFat = new BarGraphSeries<>();
-//                        BarGraphSeries<DataPoint> barGraphSeriesProtein = new BarGraphSeries<>();
+                    } else if (graphName.equals("Maistinės medžiagos")) {
+                        graphView.setVisibility(View.GONE);
+                        barChart.setVisibility(View.GONE);
+                        pieChart.setVisibility(View.VISIBLE);
+//                        graphView.setVisibility(View.GONE);
+//                        barChart.setVisibility(View.VISIBLE);
+//                        List<BarEntry> carbs = new ArrayList<>();
+//                        List<BarEntry> fat = new ArrayList<>();
+//                        List<BarEntry> protein = new ArrayList<>();
+//
 //                        for (Stats stat : response.body()) {
-                            barGraphSeriesCarbs.appendData(new DataPoint(response.body().get(1).getDate(), 10), true, response.body().size(), true);
-//                            barGraphSeriesFat.appendData(new DataPoint(stat.getDate(), stat.getFatAmount()), true, response.body().size(), true);
-//                            barGraphSeriesProtein.appendData(new DataPoint(stat.getDate(), stat.getProteinAmount()), true, response.body().size(), true);
+//                            carbs.add(new BarEntry((Long.valueOf(stat.getDate().getTime())).floatValue(), stat.getCarbAmount()));
+//                            fat.add(new BarEntry((Long.valueOf(stat.getDate().getTime())).floatValue(), stat.getFatAmount()));
+//                            protein.add(new BarEntry((Long.valueOf(stat.getDate().getTime())).floatValue(), stat.getProteinAmount()));
 //                        }
 //
-                        barGraphSeriesCarbs.setSpacing(50);
-                        barGraphSeriesCarbs.setDrawValuesOnTop(true);
-                        barGraphSeriesCarbs.setValuesOnTopColor(Color.BLACK);
+////                        carbs.add(new BarEntry(0, 10));
+////                        fat.add(new BarEntry(0, 15));
+////                        protein.add(new BarEntry(0, 7));
+////
+////                        carbs.add(new BarEntry(1, 17));
+////                        fat.add(new BarEntry(1, 5));
+////                        protein.add(new BarEntry(1, 17));
+////
+////                        carbs.add(new BarEntry(2, 20));
+////                        fat.add(new BarEntry(2, 12));
+////                        protein.add(new BarEntry(2, 13));
+//
+//                        BarDataSet carbsSet = new BarDataSet(carbs, "Angl.");
+//                        carbsSet.setColor(Color.BLUE);
+//                        BarDataSet fatSet = new BarDataSet(fat, "Rieb.");
+//                        fatSet.setColor(Color.YELLOW);
+//                        BarDataSet proteinSet = new BarDataSet(protein, "Balt.");
+//                        proteinSet.setColor(Color.WHITE);
+//
+//                        BarData barData = new BarData(carbsSet, fatSet, proteinSet);
+//                        barData.setBarWidth(0.8f);
+//
+//                        barChart.setDrawValueAboveBar(true);
+//                        barChart.setDrawGridBackground(false);
+//                        barChart.getDescription().setEnabled(false);
+//                        barChart.getLegend().setEnabled(true);
+//                        barChart.animateY(1000);
+//
+//
+//                        XAxis xAxis = barChart.getXAxis();
+//                        xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
+//                        xAxis.setValueFormatter(new DateValueFormatter());
+//                        xAxis.setGranularity(24 * 60 * 60 * 1000); // one day in milliseconds
+//                        xAxis.setLabelCount(carbs.size());
+//                        xAxis.setDrawGridLines(false);
+//                        xAxis.setDrawAxisLine(true);
+//                        xAxis.setAxisMinimum(carbs.get(0).getX());
+//                        xAxis.setAxisMaximum(carbs.get(carbs.size() - 1).getX() + xAxis.getGranularity());
+//
+//                        barChart.setData(barData);
+//
+////                        barChart.getXAxis().setAxisMaximum(carbs.get(0).getX() + barChart.getBarData().getGroupWidth(1f, 0.03f) * 3);
+////                        barChart.groupBars(carbs.get(0).getX(), 1f, 0.03f);
+//                        barChart.canScrollHorizontally(1);
+//                        barChart.invalidate();
 
-                        barGraphSeriesCarbs.setAnimated(true);
-//                        barGraphSeriesFat.setAnimated(true);
-//                        barGraphSeriesProtein.setAnimated(true);
-                        barGraphSeriesCarbs.setColor(Color.GREEN);
-//                        barGraphSeriesFat.setColor(Color.YELLOW);
-//                        barGraphSeriesProtein.setColor(Color.WHITE);
+                        List<PieEntry> entries = new ArrayList<>();
 
-                        graphView.removeAllSeries();
-                        graphView.addSeries(barGraphSeriesCarbs);
-//                        graphView.addSeries(barGraphSeriesFat);
-//                        graphView.addSeries(barGraphSeriesProtein);
-                        graphView.getGridLabelRenderer().setVerticalAxisTitle("Gramai");
+//                        for (Stats stat : response.body()) {
+//                            if (stat.getDate().equals(new java.sql.Date(System.currentTimeMillis()))) {
+                                entries.add(new PieEntry(response.body().get(2).getCarbAmount(), "Angl."));
+                                entries.add(new PieEntry(response.body().get(2).getFatAmount(), "Rieb."));
+                                entries.add(new PieEntry(response.body().get(2).getProteinAmount(), "Balt."));
+//                            }
+//                        }
+
+                        PieDataSet dataSet = new PieDataSet(entries, "Pie Chart");
+
+                        dataSet.setColors(ColorTemplate.COLORFUL_COLORS);
+                        dataSet.setSliceSpace(2f);
+                        dataSet.setValueTextColor(Color.WHITE);
+                        dataSet.setValueTextSize(12f);
+
+                        PieData pieData = new PieData(dataSet);
+
+                        pieChart.setData(pieData);
+                        pieChart.setUsePercentValues(true);
+                        pieChart.getDescription().setEnabled(false);
+                        pieChart.setDrawHoleEnabled(true);
+                        pieChart.setHoleColor(Color.TRANSPARENT);
+                        pieChart.setTransparentCircleRadius(30f);
+                        pieChart.setEntryLabelColor(Color.WHITE);
+                        pieChart.setEntryLabelTextSize(12f);
+                        pieChart.animateY(1000);
                     }
 
                     graphView.getGridLabelRenderer().setHorizontalAxisTitle("Data");
@@ -197,9 +284,20 @@ public class StatsActivity extends AppCompatActivity {
                     graphView.getViewport().setXAxisBoundsManual(false);
                 }
             }
+
             @Override
             public void onFailure(Call<List<Stats>> call, Throwable t) {
             }
         });
+    }
+
+    private static class DateValueFormatter extends ValueFormatter {
+
+        private final SimpleDateFormat mFormat = new SimpleDateFormat("dd/MM");
+
+        @Override
+        public String getFormattedValue(float value) {
+            return mFormat.format(new Date((long) value));
+        }
     }
 }
