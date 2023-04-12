@@ -78,9 +78,7 @@ public class RegisterActivity extends AppCompatActivity {
                     .enqueue(new Callback<User>() {
                         @Override
                         public void onResponse(@NonNull Call<User> call, @NonNull Response<User> response) {
-                            if (response.code() != 200) {
-                                Toast.makeText(RegisterActivity.this, "Registracija nepavyko: " + response.code(), Toast.LENGTH_SHORT).show();
-                            } else {
+                            if (response.code() == 200 && response.body() != null) {
                                 Toast.makeText(RegisterActivity.this, "Naujas naudotojas užregistruotas", Toast.LENGTH_SHORT).show();
                                 Intent i = new Intent(RegisterActivity.this, LoginActivity.class);
                                 startActivity(i);

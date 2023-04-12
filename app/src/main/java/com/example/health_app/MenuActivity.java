@@ -86,6 +86,27 @@ public class MenuActivity extends AppCompatActivity {
 
         initialize();
 
+        goAndGetUserTodayStats();
+    }
+
+    private void initialize() {
+        isValuesNan = false;
+        wasLongPressed = false;
+
+        calories = findViewById(R.id.calories);
+        water = findViewById(R.id.water);
+        cfpPercent = findViewById(R.id.cfp_percent);
+        mealTable = findViewById(R.id.mealTable);
+        btnReload = findViewById(R.id.btnReload);
+        btnReload.setImageResource(R.drawable.reload_img);
+
+        totalCarbsConsumed = 0f;
+        totalFatConsumed = 0f;
+        totalProteinConsumed = 0f;
+
+        retrofitService = new RetrofitService();
+        statsApi = retrofitService.getRetrofit().create(StatsApi.class);
+
         water.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -101,6 +122,7 @@ public class MenuActivity extends AppCompatActivity {
                 wasLongPressed = false;
             }
         });
+
         water.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
@@ -115,6 +137,7 @@ public class MenuActivity extends AppCompatActivity {
                 return true;
             }
         });
+
         btnReload.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -124,7 +147,33 @@ public class MenuActivity extends AppCompatActivity {
                 startActivity(getIntent());
             }
         });
+    }
 
+    private void goAndUpdateStats() {
+        StatsApi statsApi = retrofitService.getRetrofit().create(StatsApi.class);
+
+        StatsRequest updateStats = new StatsRequest();
+        updateStats.setStatsId(currentStats.getId());
+        updateStats.setAmountOfCups(currentStats.getAmountOfCups());
+        updateStats.setLeftCalories(totalCaloriesConsumed);
+        updateStats.setCarbAmount(totalCarbsConsumed);
+        updateStats.setFatAmount(totalFatConsumed);
+        updateStats.setProteinAmount(totalProteinConsumed);
+
+        statsApi.updateStats(updateStats).enqueue(new Callback<Stats>() {
+            @Override
+            public void onResponse(@NonNull Call<Stats> call, @NonNull Response<Stats> response) {
+
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<Stats> call, @NonNull Throwable t) {
+
+            }
+        });
+    }
+
+    private void goAndGetUserTodayStats() {
         statsApi.getCurrentUserTodayStats(currentUser.getId()).enqueue(new Callback<Stats>() {
             @Override
             public void onResponse(@NonNull Call<Stats> call, @NonNull Response<Stats> response) {
@@ -134,13 +183,12 @@ public class MenuActivity extends AppCompatActivity {
                     totalCaloriesConsumed = currentStats.getDailyCalorieIntake();
                     totalCalories = currentStats.getDailyCalorieIntake();
 
-//                    totalCarbsConsumed = currentStats.getCarbAmount();
-//                    totalFatConsumed = currentStats.getFatAmount();
-//                    totalProteinConsumed = currentStats.getProteinAmount();
                     int cups = currentStats.getAmountOfCups();
 
                     String waterCups = "Vanduo - " + cups + " x 250 ml ";
                     water.setText(waterCups);
+
+                    goAndGetUserTodayHistory();
                 }
             }
             @Override
@@ -152,7 +200,9 @@ public class MenuActivity extends AppCompatActivity {
                         "Error occurred", t);
             }
         });
+    }
 
+    private void goAndGetUserTodayHistory() {
         HistoryApi historyApi = retrofitService.getRetrofit().create(HistoryApi.class);
         historyApi.getCurrentUserTodayHistory(currentUser.getId()).enqueue(new Callback<History>() {
             @Override
@@ -200,24 +250,6 @@ public class MenuActivity extends AppCompatActivity {
                         "Error occurred", t);
             }
         });
-    }
-
-    private void initialize() {
-        isValuesNan = false;
-        wasLongPressed = false;
-        calories = findViewById(R.id.calories);
-        water = findViewById(R.id.water);
-        cfpPercent = findViewById(R.id.cfp_percent);
-        mealTable = findViewById(R.id.mealTable);
-        btnReload = findViewById(R.id.btnReload);
-        btnReload.setImageResource(R.drawable.reload_img);
-
-        totalCarbsConsumed = 0f;
-        totalFatConsumed = 0f;
-        totalProteinConsumed = 0f;
-
-        retrofitService = new RetrofitService();
-        statsApi = retrofitService.getRetrofit().create(StatsApi.class);
     }
 
     @Override
@@ -294,30 +326,6 @@ public class MenuActivity extends AppCompatActivity {
             }
             @Override
             public void onFailure(@NonNull Call<List<Product>> call, @NonNull Throwable t) {
-            }
-        });
-    }
-
-    private void goAndUpdateStats() {
-        StatsApi statsApi = retrofitService.getRetrofit().create(StatsApi.class);
-
-        StatsRequest updateStats = new StatsRequest();
-        updateStats.setStatsId(currentStats.getId());
-        updateStats.setAmountOfCups(currentStats.getAmountOfCups());
-        updateStats.setLeftCalories(totalCaloriesConsumed);
-        updateStats.setCarbAmount(totalCarbsConsumed);
-        updateStats.setFatAmount(totalFatConsumed);
-        updateStats.setProteinAmount(totalProteinConsumed);
-
-        statsApi.updateStats(updateStats).enqueue(new Callback<Stats>() {
-            @Override
-            public void onResponse(@NonNull Call<Stats> call, @NonNull Response<Stats> response) {
-
-            }
-
-            @Override
-            public void onFailure(@NonNull Call<Stats> call, @NonNull Throwable t) {
-
             }
         });
     }

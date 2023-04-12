@@ -32,10 +32,20 @@
         android:visibility="gone" />
 
     <Spinner
-        android:id="@+id/spinner"
+        android:id="@+id/graph_spinner"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="100sp"
-        android:layout_marginLeft="50sp"/>
+        android:layout_marginTop="20sp"
+        android:layout_marginBottom="10sp"
+        android:layout_gravity="center"/>
+
+    <DatePicker
+        android:id="@+id/date_picker"
+        android:layout_width="240sp"
+        android:layout_height="180sp"
+        android:datePickerMode="spinner"
+        android:calendarViewShown="false"
+        android:layout_gravity="center"
+        android:visibility="invisible" />
 
 </LinearLayout>
