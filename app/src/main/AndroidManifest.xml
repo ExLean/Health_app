@@ -55,6 +55,11 @@
             android:name=".StatsActivity"
             android:exported="true" />
 
+        <activity
+            android:name=".CalculatorActivity"
+            android:windowSoftInputMode="adjustPan"
+            android:exported="true" />
+
     </application>
 
 </manifest>

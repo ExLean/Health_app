@@ -283,6 +283,10 @@ public class MenuActivity extends AppCompatActivity {
                 return true;
             case R.id.calculation:
                 goAndUpdateStats();
+                i = new Intent(MenuActivity.this, CalculatorActivity.class);
+                i.putExtra("json_user", (new Gson()).toJson(currentUser));
+                i.putExtra("json_stats", (new Gson()).toJson(currentStats));
+                startActivity(i);
                 return true;
             case R.id.log_out:
                 goAndUpdateStats();
