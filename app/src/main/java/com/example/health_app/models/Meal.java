@@ -4,12 +4,13 @@ import androidx.annotation.NonNull;
 
 import com.example.health_app.models.type.Metric;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class Meal {
 
     private int id;
-    private int historyId;
+    private List<History> histories = new ArrayList<>();
     private String title;
     private String info;
     private int cookingTime;
@@ -18,17 +19,15 @@ public class Meal {
     private float amount;
     private Metric metric;
 
-    public Meal(int id, int historyId, String title, String info, int cookingTime, String creator, List<Product> mealProducts) {
-        this.id = id;
-        this.historyId = historyId;
-        this.title = title;
-        this.info = info;
-        this.cookingTime = cookingTime;
-        this.creator = creator;
-        this.products = mealProducts;
+    public Meal() {
     }
 
-    public Meal() {
+    public List<History> getHistories() {
+        return histories;
+    }
+
+    public void setHistories(List<History> histories) {
+        this.histories = histories;
     }
 
     public float getAmount() {
@@ -53,14 +52,6 @@ public class Meal {
 
     public void setId(int id) {
         this.id = id;
-    }
-
-    public int getHistoryId() {
-        return historyId;
-    }
-
-    public void setHistoryId(int historyId) {
-        this.historyId = historyId;
     }
 
     public String getTitle() {
@@ -103,17 +94,18 @@ public class Meal {
         this.products = products;
     }
 
-    @NonNull
     @Override
     public String toString() {
         return "Meal{" +
                 "id=" + id +
-                ", historyId=" + historyId +
+                ", histories=" + histories +
                 ", title='" + title + '\'' +
                 ", info='" + info + '\'' +
                 ", cookingTime=" + cookingTime +
                 ", creator='" + creator + '\'' +
-                ", mealProducts=" + products +
+                ", products=" + products +
+                ", amount=" + amount +
+                ", metric=" + metric +
                 '}';
     }
 }

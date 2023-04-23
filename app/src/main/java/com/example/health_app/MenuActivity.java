@@ -47,6 +47,7 @@ import com.google.gson.Gson;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import java.util.logging.Level;
@@ -167,8 +168,11 @@ public class MenuActivity extends AppCompatActivity {
             public void onClick(View v) {
                 goAndUpdateStats();
 
+                List<History> allHistories = new ArrayList<>();
+                allHistories.add(currentHistory);
+
                 Meal newMeal = new Meal();
-                newMeal.setHistoryId(currentHistory.getId());
+                newMeal.setHistories(allHistories);
                 newMeal.setTitle("");
 
                 Intent i = new Intent(MenuActivity.this,
@@ -492,7 +496,7 @@ public class MenuActivity extends AppCompatActivity {
                                     if (response.code() == 200 && response.body() != null) {
                                         MealRequest copyMeal = new MealRequest();
 
-                                        copyMeal.setHistoryId(response.body().getHistoryId());
+                                        copyMeal.setHistoryId(response.body().getHistories().get(response.body().getHistories().size() - 1).getId());
                                         copyMeal.setTitle(response.body().getTitle());
                                         if (response.body().getInfo() != null) {
                                             copyMeal.setInfo(response.body().getInfo());

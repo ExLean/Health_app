@@ -72,7 +72,7 @@ public class MealActivity extends AppCompatActivity {
             btnSave.setOnClickListener(v -> {
                 MealRequest createMeal = new MealRequest();
 
-                createMeal.setHistoryId(currentMeal.getHistoryId());
+                createMeal.setHistoryId(currentMeal.getHistories().get(currentMeal.getHistories().size() - 1).getId());
                 createMeal.setTitle(mealTitle.getText().toString());
                 createMeal.setCreator(currentUser.getUsername());
                 createMeal.setMealAmount(Float.parseFloat(mealAmount.getText().toString()));

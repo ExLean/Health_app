@@ -73,6 +73,17 @@ public class ChooseMealActivity extends AppCompatActivity {
         showFoodList();
     }
 
+    @Override
+    public void onBackPressed() {
+        if (size == 1 || size == 0) {
+            Intent i = new Intent(ChooseMealActivity.this,
+                    MenuActivity.class);
+            i.putExtra("json_user", (new Gson()).toJson(currentUser));
+            startActivity(i);
+            finish();
+        }
+    }
+
     private void initialize() {
         mealId = 0;
         mealProducts = new ArrayList<>();
@@ -127,7 +138,7 @@ public class ChooseMealActivity extends AppCompatActivity {
 
                     for (Meal meal : response.body()) {
                         if (meal.getCreator().equals(currentUser.getUsername())) {
-                            mealArr.add(meal.getTitle());
+                            mealArr.add(meal.getTitle() + "\n" + meal.getAmount() + meal.getMetric().toString().toLowerCase() + " " + meal.getHistories().get(meal.getHistories().size() - 1).getDate().toString());
                         }
                     }
 
@@ -140,8 +151,12 @@ public class ChooseMealActivity extends AppCompatActivity {
                         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                             String selected = mealArr.get(position);
 
+                            Toast.makeText(ChooseMealActivity.this,
+                                    "mealId - " + selected,
+                                    Toast.LENGTH_SHORT).show();
+
                             for (Meal meal : response.body()) {
-                                if (meal.getTitle().equals(selected)) {
+                                if (meal.getTitle().equals(selected.substring(0, selected.indexOf(' ')))) {
                                     mealId = meal.getId();
                                     break;
                                 }
