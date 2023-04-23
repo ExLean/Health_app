@@ -1,9 +1,14 @@
 package com.example.health_app;
 
 import android.annotation.SuppressLint;
+import android.app.AlarmManager;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.Typeface;
+import android.os.Build;
 import android.os.Bundle;
 import android.text.SpannableString;
 import android.text.style.StyleSpan;
@@ -32,6 +37,7 @@ import com.example.health_app.models.User;
 import com.example.health_app.models.requests.MealRequest;
 import com.example.health_app.models.requests.ProductRequest;
 import com.example.health_app.models.requests.StatsRequest;
+import com.example.health_app.receivers.WeightInNotificationReceiver;
 import com.example.health_app.retrofit.HistoryApi;
 import com.example.health_app.retrofit.MealApi;
 import com.example.health_app.retrofit.ProductApi;
@@ -41,6 +47,7 @@ import com.google.gson.Gson;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.Calendar;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -58,8 +65,10 @@ public class MenuActivity extends AppCompatActivity {
     TextView calories;
     TextView cfpPercent;
     TextView water;
-    TableLayout mealTable;
     ImageButton btnReload;
+    Button btnCreateMeal;
+    Button btnChooseMeal;
+    TableLayout mealTable;
 
     float totalCaloriesConsumed;
     float totalCalories;
@@ -69,6 +78,8 @@ public class MenuActivity extends AppCompatActivity {
 
     private boolean isValuesNan;
     private boolean wasLongPressed;
+
+    private PendingIntent pendingIntent;
 
     RetrofitService retrofitService;
     StatsApi statsApi;
@@ -90,15 +101,18 @@ public class MenuActivity extends AppCompatActivity {
     }
 
     private void initialize() {
+//        setUpNotifications();
         isValuesNan = false;
         wasLongPressed = false;
 
         calories = findViewById(R.id.calories);
         water = findViewById(R.id.water);
         cfpPercent = findViewById(R.id.cfp_percent);
-        mealTable = findViewById(R.id.mealTable);
         btnReload = findViewById(R.id.btnReload);
         btnReload.setImageResource(R.drawable.reload_img);
+        btnCreateMeal = findViewById(R.id.btnCreateMeal);
+        btnChooseMeal = findViewById(R.id.btnChooseMeal);
+        mealTable = findViewById(R.id.mealTable);
 
         totalCarbsConsumed = 0f;
         totalFatConsumed = 0f;
@@ -147,6 +161,48 @@ public class MenuActivity extends AppCompatActivity {
                 startActivity(getIntent());
             }
         });
+
+        btnCreateMeal.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                goAndUpdateStats();
+
+                Meal newMeal = new Meal();
+                newMeal.setHistoryId(currentHistory.getId());
+                newMeal.setTitle("");
+
+                Intent i = new Intent(MenuActivity.this,
+                        MealActivity.class);
+                i.putExtra("json_user", (new Gson()).toJson(currentUser));
+                i.putExtra("json_meal", (new Gson()).toJson(newMeal));
+                startActivity(i);
+                finish();
+            }
+        });
+
+        btnChooseMeal.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                goAndUpdateStats();
+
+                Intent i = new Intent(MenuActivity.this,
+                        ChooseMealActivity.class);
+                i.putExtra("json_user", (new Gson()).toJson(currentUser));
+                i.putExtra("json_history", (new Gson()).toJson(currentHistory));
+                startActivity(i);
+                finish();
+            }
+        });
+    }
+
+    private void setUpNotifications() {
+        Intent alarmIntent = new Intent(MenuActivity.this, WeightInNotificationReceiver.class);
+        pendingIntent = PendingIntent.getBroadcast(MenuActivity.this, 0, alarmIntent, 0);
+
+        AlarmManager manager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+        int interval = 8000;
+
+        manager.setInexactRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), interval, pendingIntent);
     }
 
     private void goAndUpdateStats() {
@@ -499,45 +555,45 @@ public class MenuActivity extends AppCompatActivity {
             mealTable.addView(row);
         }
 
-        TableRow rowButton = new TableRow(MenuActivity.this);
-
-        Button btn = new Button(MenuActivity.this);
-
-        String btnText = "Pridėti naują patiekalą";
-        SpannableString spanString = new SpannableString(btnText);
-        spanString.setSpan(new StyleSpan(Typeface.BOLD), 0, spanString.length(), 0);
-        btn.setText(spanString);
-
-        btn.setBackgroundResource(R.drawable.button_border);
-        btn.setTextColor(Color.BLACK);
-
-        TableRow.LayoutParams params = new TableRow.LayoutParams(
-                TableRow.LayoutParams.WRAP_CONTENT + 10,
-                TableRow.LayoutParams.WRAP_CONTENT
-        );
-        params.gravity = Gravity.END;
-        btn.setLayoutParams(params);
-
-        btn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                goAndUpdateStats();
-
-                Meal newMeal = new Meal();
-                newMeal.setHistoryId(currentHistory.getId());
-                newMeal.setTitle("");
-
-                Intent i = new Intent(MenuActivity.this,
-                        MealActivity.class);
-                i.putExtra("json_user", (new Gson()).toJson(currentUser));
-                i.putExtra("json_meal", (new Gson()).toJson(newMeal));
-                startActivity(i);
-                finish();
-            }
-        });
-
-        rowButton.addView(btn);
-        mealTable.addView(rowButton);
+//        TableRow rowButton = new TableRow(MenuActivity.this);
+//
+//        Button btn = new Button(MenuActivity.this);
+//
+//        String btnText = "Pridėti naują patiekalą";
+//        SpannableString spanString = new SpannableString(btnText);
+//        spanString.setSpan(new StyleSpan(Typeface.BOLD), 0, spanString.length(), 0);
+//        btn.setText(spanString);
+//
+//        btn.setBackgroundResource(R.drawable.button_border);
+//        btn.setTextColor(Color.BLACK);
+//
+//        TableRow.LayoutParams params = new TableRow.LayoutParams(
+//                TableRow.LayoutParams.WRAP_CONTENT + 10,
+//                TableRow.LayoutParams.WRAP_CONTENT
+//        );
+//        params.gravity = Gravity.END;
+//        btn.setLayoutParams(params);
+//
+//        btn.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                goAndUpdateStats();
+//
+//                Meal newMeal = new Meal();
+//                newMeal.setHistoryId(currentHistory.getId());
+//                newMeal.setTitle("");
+//
+//                Intent i = new Intent(MenuActivity.this,
+//                        MealActivity.class);
+//                i.putExtra("json_user", (new Gson()).toJson(currentUser));
+//                i.putExtra("json_meal", (new Gson()).toJson(newMeal));
+//                startActivity(i);
+//                finish();
+//            }
+//        });
+//
+//        rowButton.addView(btn);
+//        mealTable.addView(rowButton);
 
     }
 

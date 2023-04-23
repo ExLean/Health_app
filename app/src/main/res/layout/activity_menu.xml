@@ -64,10 +64,38 @@
         android:layout_height="match_parent"
         android:layout_weight="1">
 
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/btnCreateMeal"
+                android:layout_width="190sp"
+                android:layout_height="wrap_content"
+                android:textColor="@color/black"
+                android:textStyle="bold"
+                android:textSize="18sp"
+                android:text="Sukurti naują patiekalą"
+                android:layout_marginStart="15sp"/>
+
+            <Button
+                android:id="@+id/btnChooseMeal"
+                android:layout_width="145sp"
+                android:layout_height="wrap_content"
+                android:textColor="@color/black"
+                android:textStyle="bold"
+                android:textSize="18sp"
+                android:text="Pasirinkti patiekalą"
+                android:layout_marginStart="40sp"/>
+
+        </LinearLayout>
+
         <TableLayout
             android:id="@+id/mealTable"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5sp">
 
         </TableLayout>
 
