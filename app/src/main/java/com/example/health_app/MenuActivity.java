@@ -2,10 +2,12 @@ package com.example.health_app;
 
 import android.annotation.SuppressLint;
 import android.app.AlarmManager;
+import android.app.DatePickerDialog;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Build;
@@ -19,6 +21,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.PopupMenu;
 import android.widget.TableLayout;
@@ -47,9 +50,11 @@ import com.google.gson.Gson;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -63,6 +68,10 @@ public class MenuActivity extends AppCompatActivity {
     Stats currentStats = new Stats();
     History currentHistory = new History();
 
+    final Calendar myCalendar = Calendar.getInstance();
+    SharedPreferences sharedPreferences;
+
+    EditText dayHistoryDate;
     TextView calories;
     TextView cfpPercent;
     TextView water;
@@ -103,8 +112,22 @@ public class MenuActivity extends AppCompatActivity {
 
     private void initialize() {
 //        setUpNotifications();
+        sharedPreferences = getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
+
         isValuesNan = false;
         wasLongPressed = false;
+
+        dayHistoryDate = (EditText) findViewById(R.id.dayHistoryDate);
+        dayHistoryDate.setText(sharedPreferences.getString("date", ""));
+        DatePickerDialog.OnDateSetListener date = (view, year, month, day) -> {
+            myCalendar.set(Calendar.YEAR, year);
+            myCalendar.set(Calendar.MONTH, month);
+            myCalendar.set(Calendar.DAY_OF_MONTH, day);
+            updateLabel();
+        };
+        dayHistoryDate.setOnClickListener(view -> new DatePickerDialog(MenuActivity.this, date,
+                myCalendar.get(Calendar.YEAR), myCalendar.get(Calendar.MONTH),
+                myCalendar.get(Calendar.DAY_OF_MONTH)).show());
 
         calories = findViewById(R.id.calories);
         water = findViewById(R.id.water);
@@ -209,6 +232,16 @@ public class MenuActivity extends AppCompatActivity {
         manager.setInexactRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), interval, pendingIntent);
     }
 
+    private void updateLabel(){
+        String myFormat = "yyyy-MM-dd";
+        SimpleDateFormat dateFormat = new SimpleDateFormat(myFormat, Locale.getDefault());
+        dayHistoryDate.setText(dateFormat.format(myCalendar.getTime()));
+
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putString("date", dateFormat.format(myCalendar.getTime()));
+        editor.apply();
+    }
+
     private void goAndUpdateStats() {
         StatsApi statsApi = retrofitService.getRetrofit().create(StatsApi.class);
 
@@ -234,32 +267,37 @@ public class MenuActivity extends AppCompatActivity {
     }
 
     private void goAndGetUserTodayStats() {
-        statsApi.getCurrentUserTodayStats(currentUser.getId()).enqueue(new Callback<Stats>() {
-            @Override
-            public void onResponse(@NonNull Call<Stats> call, @NonNull Response<Stats> response) {
-                if (response.code() == 200 && response.body() != null) {
-                    currentStats = response.body();
+        // Call to stats.getCurrentUserSpecificDateStats or something
+        if (dayHistoryDate.getText().toString().equals("")) {
+            statsApi.getCurrentUserTodayStats(currentUser.getId()).enqueue(new Callback<Stats>() {
+                @Override
+                public void onResponse(@NonNull Call<Stats> call, @NonNull Response<Stats> response) {
+                    if (response.code() == 200 && response.body() != null) {
+                        currentStats = response.body();
 
-                    totalCaloriesConsumed = currentStats.getDailyCalorieIntake();
-                    totalCalories = currentStats.getDailyCalorieIntake();
+                        totalCaloriesConsumed = currentStats.getDailyCalorieIntake();
+                        totalCalories = currentStats.getDailyCalorieIntake();
 
-                    int cups = currentStats.getAmountOfCups();
+                        int cups = currentStats.getAmountOfCups();
 
-                    String waterCups = "Vanduo - " + cups + " x 250 ml ";
-                    water.setText(waterCups);
+                        String waterCups = "Vanduo - " + cups + " x 250 ml ";
+                        water.setText(waterCups);
 
-                    goAndGetUserTodayHistory();
+                        goAndGetUserTodayHistory();
+                    }
                 }
-            }
-            @Override
-            public void onFailure(@NonNull Call<Stats> call, @NonNull Throwable t) {
-                Toast.makeText(MenuActivity.this,
-                        "Nepavyko gauti dabartinio naudotojo siandienos statistikos",
-                        Toast.LENGTH_SHORT).show();
-                Logger.getLogger(MenuActivity.class.getName()).log(Level.SEVERE,
-                        "Error occurred", t);
-            }
-        });
+                @Override
+                public void onFailure(@NonNull Call<Stats> call, @NonNull Throwable t) {
+                    Toast.makeText(MenuActivity.this,
+                            "Nepavyko gauti dabartinio naudotojo siandienos statistikos",
+                            Toast.LENGTH_SHORT).show();
+                    Logger.getLogger(MenuActivity.class.getName()).log(Level.SEVERE,
+                            "Error occurred", t);
+                }
+            });
+        } else {
+            // Call a new endpoint that needs date to get stats
+        }
     }
 
     private void goAndGetUserTodayHistory() {

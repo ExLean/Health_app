@@ -28,9 +28,12 @@ import com.example.health_app.retrofit.RetrofitService;
 import com.google.gson.Gson;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -44,6 +47,7 @@ public class ChooseMealActivity extends AppCompatActivity {
     int mealId;
     List<Product> mealProducts;
     int size;
+    List<String> trueMealArr = new ArrayList<>();
 
     SearchView userMealSearch;
     ListView userMeals;
@@ -137,26 +141,37 @@ public class ChooseMealActivity extends AppCompatActivity {
                     List<String> mealArr = new ArrayList<>();
 
                     for (Meal meal : response.body()) {
-                        if (meal.getCreator().equals(currentUser.getUsername())) {
-                            mealArr.add(meal.getTitle() + "\n" + meal.getAmount() + meal.getMetric().toString().toLowerCase() + " " + meal.getHistories().get(meal.getHistories().size() - 1).getDate().toString());
-                        }
+                        mealArr.add(meal.getTitle() + "\n" + meal.getAmount()
+                                + meal.getMetric().toString().toLowerCase());
+
+//                        meal.getHistories().get(meal.getHistories().size() - 1).getDate().toString();
                     }
 
-                    adapter = new ArrayAdapter<>(ChooseMealActivity.this, android.R.layout.simple_list_item_1, mealArr);
+                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+                        trueMealArr = mealArr.stream().distinct().collect(
+                        Collectors.toList());
+                    }
+
+                    adapter = new ArrayAdapter<>(ChooseMealActivity.this,
+                            android.R.layout.simple_list_item_1, trueMealArr);
 
                     userMeals.setAdapter(adapter);
                     userMeals.setBackgroundResource(R.drawable.border);
                     userMeals.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                         @Override
-                        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                            String selected = mealArr.get(position);
+                        public void onItemClick(AdapterView<?> parent, View view,
+                                                int position, long id) {
+
+                            String selected = trueMealArr.get(position);
 
                             Toast.makeText(ChooseMealActivity.this,
                                     "mealId - " + selected,
                                     Toast.LENGTH_SHORT).show();
 
                             for (Meal meal : response.body()) {
-                                if (meal.getTitle().equals(selected.substring(0, selected.indexOf(' ')))) {
+                                if (meal.getTitle().equals(selected.substring(0,
+                                        selected.indexOf('\n')))) {
+
                                     mealId = meal.getId();
                                     break;
                                 }
@@ -167,10 +182,11 @@ public class ChooseMealActivity extends AppCompatActivity {
                     userMealSearch.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
                         @Override
                         public boolean onQueryTextSubmit(String query) {
-                            if (mealArr.contains(query)) {
+                            if (trueMealArr.contains(query)) {
                                 adapter.getFilter().filter(query);
                             } else {
-                                Toast.makeText(ChooseMealActivity.this, "Nėra tokio patiekalo", Toast.LENGTH_LONG).show();
+                                Toast.makeText(ChooseMealActivity.this,
+                                        "Nėra tokio patiekalo", Toast.LENGTH_LONG).show();
                             }
                             return false;
                         }
