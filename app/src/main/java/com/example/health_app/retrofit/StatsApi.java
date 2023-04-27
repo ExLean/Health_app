@@ -1,6 +1,7 @@
 package com.example.health_app.retrofit;
 
 import com.example.health_app.models.Stats;
+import com.example.health_app.models.requests.DateRequest;
 import com.example.health_app.models.requests.StatsRequest;
 
 import java.util.List;
@@ -35,4 +36,7 @@ public interface StatsApi {
 
     @GET("/stats/all-current/{userId}")
     Call<List<Stats>> getAllCurrentUserStatsHistory(@Path("userId") int userId);
+
+    @POST("/stats/getByDate")
+    Call<Stats> getStatsByDate(@Body DateRequest request);
 }

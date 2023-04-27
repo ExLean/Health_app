@@ -3,18 +3,13 @@ package com.example.health_app;
 import android.annotation.SuppressLint;
 import android.app.AlarmManager;
 import android.app.DatePickerDialog;
-import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.Typeface;
-import android.os.Build;
 import android.os.Bundle;
-import android.text.SpannableString;
-import android.text.style.StyleSpan;
-import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -37,6 +32,7 @@ import com.example.health_app.models.Meal;
 import com.example.health_app.models.Product;
 import com.example.health_app.models.Stats;
 import com.example.health_app.models.User;
+import com.example.health_app.models.requests.DateRequest;
 import com.example.health_app.models.requests.MealRequest;
 import com.example.health_app.models.requests.ProductRequest;
 import com.example.health_app.models.requests.StatsRequest;
@@ -107,7 +103,7 @@ public class MenuActivity extends AppCompatActivity {
 
         initialize();
 
-        goAndGetUserTodayStats();
+        goAndGetUserStats();
     }
 
     private void initialize() {
@@ -240,6 +236,11 @@ public class MenuActivity extends AppCompatActivity {
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putString("date", dateFormat.format(myCalendar.getTime()));
         editor.apply();
+
+        goAndUpdateStats();
+
+        finish();
+        startActivity(getIntent());
     }
 
     private void goAndUpdateStats() {
@@ -266,7 +267,7 @@ public class MenuActivity extends AppCompatActivity {
         });
     }
 
-    private void goAndGetUserTodayStats() {
+    private void goAndGetUserStats() {
         // Call to stats.getCurrentUserSpecificDateStats or something
         if (dayHistoryDate.getText().toString().equals("")) {
             statsApi.getCurrentUserTodayStats(currentUser.getId()).enqueue(new Callback<Stats>() {
@@ -283,7 +284,7 @@ public class MenuActivity extends AppCompatActivity {
                         String waterCups = "Vanduo - " + cups + " x 250 ml ";
                         water.setText(waterCups);
 
-                        goAndGetUserTodayHistory();
+                        goAndGetUserHistory();
                     }
                 }
                 @Override
@@ -296,58 +297,144 @@ public class MenuActivity extends AppCompatActivity {
                 }
             });
         } else {
-            // Call a new endpoint that needs date to get stats
+            DateRequest dateRequest = new DateRequest();
+
+            dateRequest.setUserId(currentUser.getId());
+            dateRequest.setDate(sharedPreferences.getString("date", ""));
+
+            statsApi.getStatsByDate(dateRequest)
+                    .enqueue(new Callback<Stats>() {
+                @Override
+                public void onResponse(@NonNull Call<Stats> call, @NonNull Response<Stats> response) {
+                    if (response.code() == 200 && response.body() != null) {
+                        currentStats = response.body();
+
+                        totalCaloriesConsumed = currentStats.getDailyCalorieIntake();
+                        totalCalories = currentStats.getDailyCalorieIntake();
+
+                        int cups = currentStats.getAmountOfCups();
+
+                        String waterCups = "Vanduo - " + cups + " x 250 ml ";
+                        water.setText(waterCups);
+
+                        goAndGetUserHistory();
+                    }
+                }
+                @Override
+                public void onFailure(@NonNull Call<Stats> call, @NonNull Throwable t) {
+                    Toast.makeText(MenuActivity.this,
+                            "Nepavyko gauti dabartinio naudotojo siandienos statistikos",
+                            Toast.LENGTH_SHORT).show();
+                    Logger.getLogger(MenuActivity.class.getName()).log(Level.SEVERE,
+                            "Error occurred", t);
+                }
+            });
         }
     }
 
-    private void goAndGetUserTodayHistory() {
+    private void goAndGetUserHistory() {
         HistoryApi historyApi = retrofitService.getRetrofit().create(HistoryApi.class);
-        historyApi.getCurrentUserTodayHistory(currentUser.getId()).enqueue(new Callback<History>() {
-            @Override
-            public void onResponse(@NonNull Call<History> call, @NonNull Response<History> response) {
-                if (response.code() == 200) {
-                    assert response.body() != null;
-                    if (response.body().getMeals() != null) {
-                        currentHistory = response.body();
+        if (dayHistoryDate.getText().toString().equals("")) {
+            historyApi.getCurrentUserTodayHistory(currentUser.getId()).enqueue(new Callback<History>() {
+                @Override
+                public void onResponse(@NonNull Call<History> call, @NonNull Response<History> response) {
+                    if (response.code() == 200) {
+                        assert response.body() != null;
+                        if (response.body().getMeals() != null) {
+                            currentHistory = response.body();
 
-                        fillMealTable();
+                            fillMealTable();
 
-                        String s = String.valueOf(totalCaloriesConsumed);
-                        BigDecimal rounded = new BigDecimal(s).setScale(1, RoundingMode.HALF_UP);
-                        String currentKcal = rounded + "/" + totalCalories + " kcal";
-                        if (isValuesNan) {
-                            calories.setTextColor(Color.RED);
+                            String s = String.valueOf(totalCaloriesConsumed);
+                            BigDecimal rounded = new BigDecimal(s).setScale(1, RoundingMode.HALF_UP);
+                            String currentKcal = rounded + "/" + totalCalories + " kcal";
+                            if (isValuesNan) {
+                                calories.setTextColor(Color.RED);
+                            }
+                            calories.setText(currentKcal);
+
+                            float cfpSum = totalCarbsConsumed + totalFatConsumed + totalProteinConsumed;
+                            if (!Float.isNaN(cfpSum) && cfpSum > 0) {
+                                String c = String.valueOf(((totalCarbsConsumed / cfpSum) * 100.0));
+                                BigDecimal roundedCarbs = new BigDecimal(c).setScale(0, RoundingMode.HALF_UP);
+
+                                String f = String.valueOf(((totalFatConsumed / cfpSum) * 100.0));
+                                BigDecimal roundedFat = new BigDecimal(f).setScale(0, RoundingMode.HALF_UP);
+
+                                String p = String.valueOf(((totalProteinConsumed / cfpSum) * 100.0));
+                                BigDecimal roundedProtein = new BigDecimal(p).setScale(0, RoundingMode.HALF_UP);
+
+                                String currentCfp = "Angl. - " + roundedCarbs + " %   Rieb. - " + roundedFat + " %   Balt. - " + roundedProtein + " %";
+                                cfpPercent.setText(currentCfp);
+                            }
+
+                            goAndUpdateStats();
                         }
-                        calories.setText(currentKcal);
-
-                        float cfpSum = totalCarbsConsumed + totalFatConsumed + totalProteinConsumed;
-                        if (!Float.isNaN(cfpSum) && cfpSum > 0) {
-                            String c = String.valueOf(((totalCarbsConsumed / cfpSum) * 100.0));
-                            BigDecimal roundedCarbs = new BigDecimal(c).setScale(0, RoundingMode.HALF_UP);
-
-                            String f = String.valueOf(((totalFatConsumed / cfpSum) * 100.0));
-                            BigDecimal roundedFat = new BigDecimal(f).setScale(0, RoundingMode.HALF_UP);
-
-                            String p = String.valueOf(((totalProteinConsumed / cfpSum) * 100.0));
-                            BigDecimal roundedProtein = new BigDecimal(p).setScale(0, RoundingMode.HALF_UP);
-
-                            String currentCfp = "Angl. - " + roundedCarbs + " %   Rieb. - " + roundedFat + " %   Balt. - " + roundedProtein + " %";
-                            cfpPercent.setText(currentCfp);
-                        }
-
-                        goAndUpdateStats();
                     }
                 }
-            }
-            @Override
-            public void onFailure(@NonNull Call<History> call, @NonNull Throwable t) {
-                Toast.makeText(MenuActivity.this,
-                        "Nepavyko gauti dabartinio naudotojo siandienos istorijos",
-                        Toast.LENGTH_SHORT).show();
-                Logger.getLogger(MenuActivity.class.getName()).log(Level.SEVERE,
-                        "Error occurred", t);
-            }
-        });
+                @Override
+                public void onFailure(@NonNull Call<History> call, @NonNull Throwable t) {
+                    Toast.makeText(MenuActivity.this,
+                            "Nepavyko gauti dabartinio naudotojo siandienos istorijos",
+                            Toast.LENGTH_SHORT).show();
+                    Logger.getLogger(MenuActivity.class.getName()).log(Level.SEVERE,
+                            "Error occurred", t);
+                }
+            });
+        } else {
+            DateRequest dateRequest = new DateRequest();
+
+            dateRequest.setUserId(currentUser.getId());
+            dateRequest.setDate(sharedPreferences.getString("date", ""));
+
+            historyApi.getHistoryByDate(dateRequest)
+                    .enqueue(new Callback<History>() {
+                @Override
+                public void onResponse(@NonNull Call<History> call, @NonNull Response<History> response) {
+                    if (response.code() == 200) {
+                        assert response.body() != null;
+                        if (response.body().getMeals() != null) {
+                            currentHistory = response.body();
+
+                            fillMealTable();
+
+                            String s = String.valueOf(totalCaloriesConsumed);
+                            BigDecimal rounded = new BigDecimal(s).setScale(1, RoundingMode.HALF_UP);
+                            String currentKcal = rounded + "/" + totalCalories + " kcal";
+                            if (isValuesNan) {
+                                calories.setTextColor(Color.RED);
+                            }
+                            calories.setText(currentKcal);
+
+                            float cfpSum = totalCarbsConsumed + totalFatConsumed + totalProteinConsumed;
+                            if (!Float.isNaN(cfpSum) && cfpSum > 0) {
+                                String c = String.valueOf(((totalCarbsConsumed / cfpSum) * 100.0));
+                                BigDecimal roundedCarbs = new BigDecimal(c).setScale(0, RoundingMode.HALF_UP);
+
+                                String f = String.valueOf(((totalFatConsumed / cfpSum) * 100.0));
+                                BigDecimal roundedFat = new BigDecimal(f).setScale(0, RoundingMode.HALF_UP);
+
+                                String p = String.valueOf(((totalProteinConsumed / cfpSum) * 100.0));
+                                BigDecimal roundedProtein = new BigDecimal(p).setScale(0, RoundingMode.HALF_UP);
+
+                                String currentCfp = "Angl. - " + roundedCarbs + " %   Rieb. - " + roundedFat + " %   Balt. - " + roundedProtein + " %";
+                                cfpPercent.setText(currentCfp);
+                            }
+
+                            goAndUpdateStats();
+                        }
+                    }
+                }
+                @Override
+                public void onFailure(@NonNull Call<History> call, @NonNull Throwable t) {
+                    Toast.makeText(MenuActivity.this,
+                            "Nepavyko gauti dabartinio naudotojo siandienos istorijos",
+                            Toast.LENGTH_SHORT).show();
+                    Logger.getLogger(MenuActivity.class.getName()).log(Level.SEVERE,
+                            "Error occurred", t);
+                }
+            });
+        }
     }
 
     @Override

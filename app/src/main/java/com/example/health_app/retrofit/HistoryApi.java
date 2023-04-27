@@ -1,6 +1,8 @@
 package com.example.health_app.retrofit;
 
 import com.example.health_app.models.History;
+import com.example.health_app.models.User;
+import com.example.health_app.models.requests.DateRequest;
 import com.example.health_app.models.requests.HistoryRequest;
 
 import java.util.List;
@@ -28,4 +30,7 @@ public interface HistoryApi {
 
     @GET("history/current/{userId}")
     Call<History> getCurrentUserTodayHistory(@Path("userId") int userId);
+
+    @POST("/history/getByDate")
+    Call<History> getHistoryByDate(@Body DateRequest request);
 }
