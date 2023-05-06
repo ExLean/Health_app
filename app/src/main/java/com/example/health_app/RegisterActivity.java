@@ -3,6 +3,7 @@ package com.example.health_app;
 import android.app.DatePickerDialog;
 import android.content.Intent;
 import android.os.Bundle;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
@@ -45,8 +46,8 @@ public class RegisterActivity extends AppCompatActivity {
     }
 
     private void initializeComponents() {
-        TextInputEditText usr_text = findViewById(R.id.username_register_textField);
-        TextInputEditText pss_text = findViewById(R.id.password_register_textField);
+        EditText usr_text = findViewById(R.id.username_register_textField);
+        EditText pss_text = findViewById(R.id.password_register_textField);
         EditText eml_text = findViewById(R.id.email_register_textField);
 
         editText = (EditText) findViewById(R.id.Birthday);
@@ -60,8 +61,8 @@ public class RegisterActivity extends AppCompatActivity {
                 myCalendar.get(Calendar.YEAR), myCalendar.get(Calendar.MONTH),
                 myCalendar.get(Calendar.DAY_OF_MONTH)).show());
 
-        TextInputEditText hgh_text = findViewById(R.id.height_register_textField);
-        MaterialButton register = findViewById(R.id.register_btn);
+        EditText hgh_text = findViewById(R.id.height_register_textField);
+        Button register = findViewById(R.id.register_btn);
 
         RetrofitService retrofitService = new RetrofitService();
         UserApi userApi = retrofitService.getRetrofit().create(UserApi.class);

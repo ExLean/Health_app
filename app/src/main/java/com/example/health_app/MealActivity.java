@@ -267,7 +267,7 @@ public class MealActivity extends AppCompatActivity {
         spanString.setSpan(new StyleSpan(Typeface.BOLD), 0, spanString.length(), 0);
         btn.setText(spanString);
 
-        btn.setBackgroundResource(R.drawable.button_border);
+        btn.setBackgroundColor(Color.parseColor("#80dfff"));
         btn.setTextColor(Color.BLACK);
 
         TableRow.LayoutParams params = new TableRow.LayoutParams(

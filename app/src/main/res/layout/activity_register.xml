@@ -4,30 +4,28 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:padding="25dp"
-    tools:context=".RegisterActivity"
-    android:background="#808080"
-    tools:ignore="Overdraw">
+    tools:context=".RegisterActivity">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-        <com.google.android.material.textfield.TextInputEditText
+        <EditText
             android:id="@+id/username_register_textField"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="@string/usr_hint"
-            android:minHeight="48dp"
+            android:minHeight="48sp"
             android:textColor="@color/black"/>
 
-        <com.google.android.material.textfield.TextInputEditText
+        <EditText
             android:id="@+id/password_register_textField"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="@string/psw_hint"
             android:inputType="textPassword"
-            android:minHeight="48dp"
+            android:minHeight="48sp"
             android:textColor="@color/black"/>
 
         <EditText
@@ -36,17 +34,17 @@
             android:layout_height="wrap_content"
             android:hint="@string/eml_hint"
             android:inputType="textEmailAddress"
-            android:minHeight="48dp"
+            android:minHeight="48sp"
             android:textColor="@color/black"
             android:autofillHints="emailAddress" />
 
-        <com.google.android.material.textfield.TextInputEditText
+        <EditText
             android:id="@+id/height_register_textField"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="@string/hgh_hint"
             android:inputType="number"
-            android:minHeight="48dp"
+            android:minHeight="48sp"
             android:textColor="@color/black"/>
 
         <EditText
@@ -60,20 +58,19 @@
             android:focusableInTouchMode="false"
             android:hint="@string/dte_hint"
             android:inputType="date"
-            android:minHeight="48dp"
+            android:minHeight="48sp"
             android:textColor="@color/black" />
-
 
     </LinearLayout>
 
-    <com.google.android.material.button.MaterialButton
+    <Button
         android:id="@+id/register_btn"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:layout_marginBottom="30dp"
+        android:layout_marginBottom="80sp"
         android:text="@string/register"
-        android:background="@drawable/button_border"
-        android:textColor="@color/black"/>
+        android:textColor="@color/black"
+        android:backgroundTint="#80dfff" />
 
 </RelativeLayout>

@@ -4,9 +4,7 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:weightSum="3"
-    android:background="#808080"
-    tools:ignore="Overdraw">
+    android:weightSum="4">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -19,7 +17,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:text="@string/meal"
-            android:layout_marginTop="50dp"
+            android:layout_marginTop="20dp"
             android:textColor="@color/black"
             android:textSize="18sp"
             android:textStyle="bold"/>
@@ -127,7 +125,7 @@
             android:text="@string/save"
             android:layout_marginTop="5dp"
             android:textColor="@color/black"
-            android:background="@drawable/button_border"/>
+            android:backgroundTint="#80dfff"/>
 
     </LinearLayout>
 
@@ -136,7 +134,7 @@
         android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_weight="2">
+        android:layout_weight="3">
 
         <TableLayout
             android:id="@+id/productTable"

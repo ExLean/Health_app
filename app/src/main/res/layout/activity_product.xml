@@ -3,9 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="#808080"
-    tools:ignore="Overdraw">
+    android:layout_height="match_parent">
 
     <TextView
         android:layout_width="wrap_content"
@@ -83,7 +81,6 @@
         android:text="@string/save"
         android:layout_marginTop="15dp"
         android:textColor="@color/black"
-        android:background="@drawable/button_border"
-        android:backgroundTint="@color/black"/>
+        android:backgroundTint="#80dfff"/>
 
 </LinearLayout>

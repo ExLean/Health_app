@@ -4,9 +4,7 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:weightSum="2"
-    android:background="#808080"
-    tools:ignore="Overdraw">
+    android:weightSum="2">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -34,7 +32,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:layout_marginTop="100dp"
+            android:layout_marginTop="40sp"
             android:textColor="@color/black"
             android:textSize="24sp"
             android:textStyle="bold" />
@@ -65,7 +63,7 @@
             android:layout_width="32sp"
             android:layout_height="32sp"
             android:layout_gravity="end"
-            android:layout_marginTop="15sp"
+            android:layout_marginTop="5sp"
             android:layout_marginEnd="50dp"
             android:src="@drawable/reload_img"
             android:contentDescription="@string/refresh" />
@@ -92,17 +90,19 @@
                 android:textStyle="bold"
                 android:textSize="18sp"
                 android:text="Sukurti naują patiekalą"
-                android:layout_marginStart="15sp"/>
+                android:layout_marginStart="15sp"
+                android:backgroundTint="#80dfff" />
 
             <Button
                 android:id="@+id/btnChooseMeal"
-                android:layout_width="145sp"
+                android:layout_width="150sp"
                 android:layout_height="wrap_content"
                 android:textColor="@color/black"
                 android:textStyle="bold"
                 android:textSize="18sp"
                 android:text="Pasirinkti patiekalą"
-                android:layout_marginStart="40sp"/>
+                android:layout_marginStart="40sp"
+                android:backgroundTint="#80dfff" />
 
         </LinearLayout>
 

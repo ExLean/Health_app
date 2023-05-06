@@ -125,15 +125,15 @@ public class ProfileActivity extends AppCompatActivity {
         saveUser = findViewById(R.id.save_user);
 
         String text;
-        text = "Slapyvardis: " + currentUser.getUsername();
+        text = "Slapyvardis: \n" + currentUser.getUsername();
         nameView.setText(text);
-        text = "El. paštas: " + currentUser.getEmail();
+        text = "El. paštas: \n" + currentUser.getEmail();
         emailView.setText(text);
-        text = "Gimimo data: " + currentUser.getBirthday();
+        text = "Gimimo data: \n" + currentUser.getBirthday();
         birthdayView.setText(text);
-        text = "Ūgis: " + String.valueOf(currentUser.getHeight());
+        text = "Ūgis: \n" + String.valueOf(currentUser.getHeight()) + " cm";
         heightView.setText(text);
-        text = "Svoris: " + String.valueOf(currentStats.getWeight());
+        text = "Svoris: \n" + String.valueOf(currentStats.getWeight()) + " kg";
         weightView.setText(text);
 
         birthdayEdit.setVisibility(View.INVISIBLE);
